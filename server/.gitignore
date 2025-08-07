@@ -3,4 +3,5 @@
 
 # Optional: Ignore logs, env files, and OS files
 *.log
+.env
 .DS_Store
