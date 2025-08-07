@@ -1,0 +1,239 @@
+import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  TextField,
+  Button,
+  InputAdornment,
+  IconButton,
+  Snackbar,
+  Alert,
+  Typography,
+  Box,
+  Tabs,
+  Tab,
+  Paper,
+} from "@mui/material";
+import SchoolIcon from "@mui/icons-material/School";
+import LoginIcon from "@mui/icons-material/Login";
+import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+
+export default function AuthDialog({
+  open,
+  onClose,
+  onLogin,
+  onRegister,
+  setLoginForm,
+  setRegisterForm,
+  showPassword,
+  setShowPassword,
+  showRegPassword,
+  setShowRegPassword,
+  snackbar,
+  setSnackbar,
+  authTab,
+  setAuthTab,
+}) {
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+      <Paper elevation={0} sx={{ p: 0, bgcolor: "transparent" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            pt: 4,
+          }}
+        >
+          <SchoolIcon sx={{ fontSize: 48, color: "primary.main", mb: 1 }} />
+          <Typography
+            variant="h5"
+            fontWeight={800}
+            sx={{ mb: 2, letterSpacing: 1 }}
+          >
+            {authTab === 0 ? "Login" : "Register"}
+          </Typography>
+        </Box>
+        <Tabs
+          value={authTab}
+          onChange={(_, v) => setAuthTab(v)}
+          variant="fullWidth"
+          sx={{ mb: 2 }}
+        >
+          <Tab label="Login" />
+          <Tab label="Register" />
+        </Tabs>
+        <DialogContent>
+          {authTab === 0 ? (
+            <Box component="form" onSubmit={onLogin}>
+              <TextField
+                label="Email"
+                name="email"
+                fullWidth
+                sx={{ mb: 2 }}
+                onChange={(e) =>
+                  setLoginForm((f) => ({ ...f, email: e.target.value }))
+                }
+                autoComplete="username"
+              />
+              <TextField
+                label="Password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                fullWidth
+                sx={{ mb: 2 }}
+                onChange={(e) =>
+                  setLoginForm((f) => ({ ...f, password: e.target.value }))
+                }
+                autoComplete="current-password"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword((show) => !show)}
+                        edge="end"
+                        size="small"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                size="large"
+                startIcon={<LoginIcon />}
+                sx={{
+                  fontWeight: 700,
+                  py: 1.2,
+                  borderRadius: 2,
+                  mt: 1,
+                  fontSize: 17,
+                }}
+              >
+                Login
+              </Button>
+            </Box>
+          ) : (
+            <Box component="form" onSubmit={onRegister}>
+              <TextField
+                label="Name"
+                name="name"
+                fullWidth
+                sx={{ mb: 2 }}
+                onChange={(e) =>
+                  setRegisterForm((f) => ({ ...f, name: e.target.value }))
+                }
+              />
+              <TextField
+                label="Email"
+                name="email"
+                fullWidth
+                sx={{ mb: 2 }}
+                onChange={(e) =>
+                  setRegisterForm((f) => ({ ...f, email: e.target.value }))
+                }
+              />
+              <TextField
+                label="Phone"
+                name="phone"
+                fullWidth
+                sx={{ mb: 2 }}
+                onChange={(e) =>
+                  setRegisterForm((f) => ({ ...f, phone: e.target.value }))
+                }
+              />
+              <TextField
+                label="Institute Name"
+                name="institute"
+                fullWidth
+                sx={{ mb: 2 }}
+                onChange={(e) =>
+                  setRegisterForm((f) => ({ ...f, institute: e.target.value }))
+                }
+              />
+              <TextField
+                label="Address"
+                name="address"
+                fullWidth
+                sx={{ mb: 2 }}
+                onChange={(e) =>
+                  setRegisterForm((f) => ({ ...f, address: e.target.value }))
+                }
+              />
+              <TextField
+                label="ID Number"
+                name="idNumber"
+                fullWidth
+                sx={{ mb: 2 }}
+                onChange={(e) =>
+                  setRegisterForm((f) => ({ ...f, idNumber: e.target.value }))
+                }
+              />
+              <TextField
+                label="Password"
+                name="password"
+                type={showRegPassword ? "text" : "password"}
+                fullWidth
+                sx={{ mb: 2 }}
+                onChange={(e) =>
+                  setRegisterForm((f) => ({ ...f, password: e.target.value }))
+                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowRegPassword((show) => !show)}
+                        edge="end"
+                        size="small"
+                      >
+                        {showRegPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                size="large"
+                startIcon={<PersonAddAltIcon />}
+                sx={{
+                  fontWeight: 700,
+                  py: 1.2,
+                  borderRadius: 2,
+                  mt: 1,
+                  fontSize: 17,
+                }}
+              >
+                Register
+              </Button>
+            </Box>
+          )}
+        </DialogContent>
+      </Paper>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.success ? "success" : "error"}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.msg}
+        </Alert>
+      </Snackbar>
+    </Dialog>
+  );
+}

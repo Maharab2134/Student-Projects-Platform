@@ -1,0 +1,6 @@
+# Ignore node_modules everywhere
+/node_modules
+
+# Optional: Ignore logs, env files, and OS files
+*.log
+.DS_Store
