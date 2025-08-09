@@ -18,15 +18,15 @@ const statusColor = (status) => {
   switch (status) {
     case "Pending":
       return "warning";
-    case "Accepted": //payment received
+    case "Accepted":
       return "info";
-    case "Rejected": //payment not received
+    case "Rejected":
       return "error";
-    case "Working": //in progress
+    case "Working":
       return "primary";
-    case "Delivery": //ready for delivery
+    case "Delivery":
       return "success";
-    case "Complete": //completed
+    case "Complete":
       return "success";
     default:
       return "default";
@@ -42,7 +42,11 @@ const statusFlow = [
   "Complete",
 ];
 
-export default function AdminOrdersView({ adminOrders, onNextStage, onDeleteOrder }) {
+export default function AdminOrdersView({
+  adminOrders,
+  onNextStage,
+  onDeleteOrder,
+}) {
   return (
     <Box>
       <Typography
@@ -58,6 +62,7 @@ export default function AdminOrdersView({ adminOrders, onNextStage, onDeleteOrde
           <TableRow>
             <TableCell>User ID</TableCell>
             <TableCell>Projects</TableCell>
+            <TableCell>Rating</TableCell>
             <TableCell>Total</TableCell>
             <TableCell>Payment</TableCell>
             <TableCell>Tran ID</TableCell>
@@ -71,6 +76,7 @@ export default function AdminOrdersView({ adminOrders, onNextStage, onDeleteOrde
             <TableRow key={o._id}>
               <TableCell>{o.userId}</TableCell>
               <TableCell>{o.projects.map((p) => p.title).join(", ")}</TableCell>
+              <TableCell>{o.rating}</TableCell>
               <TableCell>BDT {o.total}k</TableCell>
               <TableCell>{o.paymentMethod}</TableCell>
               <TableCell>{o.transactionId}</TableCell>
@@ -83,21 +89,49 @@ export default function AdminOrdersView({ adminOrders, onNextStage, onDeleteOrde
               </TableCell>
               <TableCell>{new Date(o.createdAt).toLocaleString()}</TableCell>
               <TableCell>
-                {o.status !== "Complete" && (
-                  <>
+                {o.status === "Pending" ? (
+                  <Box sx={{ display: "flex", gap: 1 }}>
                     <Button
                       variant="contained"
-                      color="success"
+                      color="info"
                       size="small"
-                      onClick={() => {
-                        const currentIndex = statusFlow.indexOf(o.status);
-                        const nextStatus = statusFlow[currentIndex + 1];
-                        if (nextStatus) onNextStage(o._id, nextStatus);
-                      }}
-                      sx={{ mr: 1 }}
+                      onClick={() => onNextStage(o._id, "Accepted")}
                     >
-                      Next Stage
+                      Accepted
                     </Button>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      size="small"
+                      onClick={() => onNextStage(o._id, "Rejected")}
+                    >
+                      Rejected
+                    </Button>
+                    <IconButton
+                      color="error"
+                      size="small"
+                      onClick={() => onDeleteOrder(o._id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                ) : (
+                  <>
+                    {o.status !== "Complete" && o.status !== "Rejected" && (
+                      <Button
+                        variant="contained"
+                        color="success"
+                        size="small"
+                        onClick={() => {
+                          const currentIndex = statusFlow.indexOf(o.status);
+                          const nextStatus = statusFlow[currentIndex + 1];
+                          if (nextStatus) onNextStage(o._id, nextStatus);
+                        }}
+                        sx={{ mr: 1 }}
+                      >
+                        Next Stage
+                      </Button>
+                    )}
                     <IconButton
                       color="error"
                       size="small"

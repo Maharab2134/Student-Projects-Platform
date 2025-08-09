@@ -11,49 +11,77 @@ import {
   FormControl,
   InputLabel,
   useTheme,
+  Avatar,
+  Divider,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
-import { motion } from "framer-motion";
-import PersonIcon from "@mui/icons-material/Person";
-import EmailIcon from "@mui/icons-material/Email";
-import PhoneIcon from "@mui/icons-material/Phone";
-import SchoolIcon from "@mui/icons-material/School";
-import EventIcon from "@mui/icons-material/Event";
-import DescriptionIcon from "@mui/icons-material/Description";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Email,
+  Phone,
+  School,
+  Event,
+  Description,
+  Fingerprint,
+  CheckCircle,
+  Pending,
+  Cancel,
+  ArrowForward,
+  Delete,
+} from "@mui/icons-material";
 import axios from "axios";
-import FingerprintIcon from "@mui/icons-material/Fingerprint";
 
-const statusColors = {
-  Pending: "default",
-  "In Progress": "warning",
-  Completed: "success",
-  Rejected: "error",
+const statusConfig = {
+  Pending: {
+    color: "warning",
+    icon: <Pending color="warning" />,
+  },
+  "In Progress": {
+    color: "info",
+    icon: <ArrowForward color="info" />,
+  },
+  Completed: {
+    color: "success",
+    icon: <CheckCircle color="success" />,
+  },
+  Rejected: {
+    color: "error",
+    icon: <Cancel color="error" />,
+  },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: (i) => ({
+  hidden: { opacity: 0, y: 20 },
+  visible: {
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.08, type: "spring", stiffness: 80 },
-  }),
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+  exit: { opacity: 0, x: -20 },
 };
 
 export default function AdminCustomRequests({ user }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
   const theme = useTheme();
 
   useEffect(() => {
     if (user?.isAdmin) {
-      axios
-        .get("http://localhost:5000/api/admin/requests", {
-          headers: { Authorization: user.token },
-        })
-        .then((res) => {
-          setRequests(res.data);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
+      const fetchRequests = () => {
+        setLoading(true);
+        axios
+          .get("http://localhost:5000/api/admin/requests", {
+            headers: { Authorization: user.token },
+          })
+          .then((res) => {
+            setRequests(res.data);
+            setLoading(false);
+          })
+          .catch(() => setLoading(false));
+      };
+      fetchRequests();
     }
   }, [user]);
 
@@ -70,177 +98,282 @@ export default function AdminCustomRequests({ user }) {
         )
       );
     } catch (err) {
-      alert("Failed to update status");
+      console.error("Failed to update status:", err);
+    }
+  };
+
+  const handleDeleteRequest = async (id) => {
+    setDeletingId(id);
+    try {
+      await axios.delete(`http://localhost:5000/api/admin/request/${id}`, {
+        headers: { Authorization: user.token },
+      });
+      setRequests((prev) => prev.filter((req) => req._id !== id));
+    } catch (err) {
+      console.error("Failed to delete request:", err);
+    } finally {
+      setDeletingId(null);
     }
   };
 
   if (!user?.isAdmin) return null;
 
   return (
-    <Box sx={{ maxWidth: 1100, mx: "auto", my: 4, px: 2 }}>
+    <Box sx={{ maxWidth: 1200, mx: "auto", my: 4, px: { xs: 2, md: 4 } }}>
       <Typography
         variant="h4"
         fontWeight={800}
         sx={{
           mb: 4,
           textAlign: "center",
-          letterSpacing: 1,
-          color: theme.palette.mode === "dark" ? "#fff" : "primary.main",
+          color: "primary.main",
+          position: "relative",
+          "&:after": {
+            content: '""',
+            position: "absolute",
+            bottom: -8,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 80,
+            height: 4,
+            bgcolor: "primary.main",
+            borderRadius: 2,
+          },
         }}
       >
         Custom Project Requests
       </Typography>
 
       {loading ? (
-        <Box sx={{ textAlign: "center", my: 6 }}>
-          <CircularProgress />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "50vh",
+          }}
+        >
+          <CircularProgress size={60} thickness={4} />
         </Box>
       ) : requests.length === 0 ? (
-        <Box sx={{ textAlign: "center", mt: 8 }}>
+        <Box
+          sx={{
+            textAlign: "center",
+            mt: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
           <img
-            src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
+            src="https://cdn-icons-png.flaticon.com/512/4076/4076478.png"
             alt="No requests"
-            width={120}
-            style={{ opacity: 0.5, marginBottom: 16 }}
+            width={150}
+            style={{ opacity: 0.7 }}
           />
-          <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
-            No custom project requests found.
+          <Typography
+            variant="h6"
+            sx={{
+              color: "text.secondary",
+              maxWidth: 400,
+              mx: "auto",
+            }}
+          >
+            No custom project requests found. Check back later!
           </Typography>
         </Box>
       ) : (
         <Stack spacing={3}>
-          {requests.map((req, i) => (
-            <motion.div
-              key={req._id}
-              custom={i}
-              variants={cardVariants}
-              initial="hidden"
-              animate="visible"
-              whileHover={{
-                scale: 1.02,
-                boxShadow: theme.shadows[8],
-              }}
-              style={{ borderRadius: 16 }}
-            >
-              <Paper
-                elevation={4}
-                sx={{
-                  p: 3,
-                  borderRadius: 3,
-                  minHeight: 220,
-                  display: "flex",
-                  flexDirection: { xs: "column", md: "row" },
-                  alignItems: { md: "center" },
-                  justifyContent: "space-between",
-                  gap: 3,
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? theme.palette.grey[900]
-                      : theme.palette.background.paper,
-                  border: `1px solid ${theme.palette.divider}`,
-                  transition: "box-shadow 0.3s, border 0.3s",
-                  "&:hover": {
-                    border: `1.5px solid ${theme.palette.primary.main}`,
-                  },
-                }}
+          <AnimatePresence>
+            {requests.map((req) => (
+              <motion.div
+                key={req._id}
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                layout
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <Stack spacing={1} sx={{ minWidth: 260 }}>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <PersonIcon color="primary" fontSize="small" />
-                    <Typography fontWeight={700}>{req.name}</Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <FingerprintIcon color="action" fontSize="small" />
-                    <Typography fontWeight={700}>{req._id}</Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <EmailIcon color="action" fontSize="small" />
-                    <Typography variant="body2" color="text.secondary">
-                      {req.email}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <PhoneIcon color="action" fontSize="small" />
-                    <Typography variant="body2" color="text.secondary">
-                      {req.phone}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <SchoolIcon color="action" fontSize="small" />
-                    <Typography variant="body2" color="text.secondary">
-                      {req.university}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <DescriptionIcon color="action" fontSize="small" />
-                    <Typography variant="body2" color="text.secondary">
-                      {req.subject}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <EventIcon color="action" fontSize="small" />
-                    <Typography variant="body2" color="text.secondary">
-                      Deadline: {req.deadline}
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
-                    sx={{ mt: 1 }}
-                  >
-                    <Chip
-                      label={new Date(req.createdAt).toLocaleString()}
-                      size="small"
-                      sx={{
-                        bgcolor:
-                          theme.palette.mode === "dark"
-                            ? theme.palette.grey[800]
-                            : theme.palette.grey[200],
-                        color: theme.palette.text.primary,
-                      }}
-                    />
-                    <Chip
-                      label={req.status || "Pending"}
-                      color={statusColors[req.status] || "default"}
-                      size="small"
-                      sx={{ fontWeight: 600, letterSpacing: 1 }}
-                    />
-                  </Stack>
-                </Stack>
-
-                <Box sx={{ flex: 1, minWidth: 200 }}>
-                  <Typography
-                    variant="body2"
+                <Paper
+                  elevation={2}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    borderLeft: `4px solid ${
+                      theme.palette[statusConfig[req.status]?.color] ||
+                      theme.palette.grey[500]
+                    }`,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      boxShadow: theme.shadows[6],
+                      borderLeftWidth: 6,
+                    },
+                  }}
+                >
+                  <Box
                     sx={{
-                      color: theme.palette.text.primary,
-                      mb: 2,
-                      fontStyle: "italic",
-                      fontSize: 16,
-                      minHeight: 48,
+                      display: "flex",
+                      flexDirection: { xs: "column", md: "row" },
+                      gap: 3,
                     }}
                   >
-                    "{req.description}"
-                  </Typography>
-                  <FormControl size="small" sx={{ minWidth: 160 }}>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      value={req.status || "Pending"}
-                      label="Status"
-                      onChange={(e) =>
-                        handleStatusChange(req._id, e.target.value)
-                      }
-                    >
-                      <MenuItem value="Pending">Pending</MenuItem>
-                      <MenuItem value="In Progress">In Progress</MenuItem>
-                      <MenuItem value="Completed">Completed</MenuItem>
-                      <MenuItem value="Rejected">Rejected</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-              </Paper>
-            </motion.div>
-          ))}
+                    {/* User Info Section */}
+                    <Box sx={{ minWidth: 280 }}>
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Avatar
+                          sx={{
+                            bgcolor: "primary.main",
+                            width: 48,
+                            height: 48,
+                          }}
+                        >
+                          {req.name.charAt(0)}
+                        </Avatar>
+                        <Box>
+                          <Typography fontWeight={700}>{req.name}</Typography>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <Email fontSize="small" />
+                            {req.email}
+                          </Typography>
+                        </Box>
+                      </Stack>
+
+                      <Divider sx={{ my: 2 }} />
+
+                      <Stack spacing={1.5}>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Fingerprint fontSize="small" color="action" />
+                          <Typography variant="body2" color="text.secondary">
+                            ID: {req._id.slice(-8)}
+                          </Typography>
+                        </Stack>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Phone fontSize="small" color="action" />
+                          <Typography variant="body2" color="text.secondary">
+                            {req.phone || "Not provided"}
+                          </Typography>
+                        </Stack>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <School fontSize="small" color="action" />
+                          <Typography variant="body2" color="text.secondary">
+                            {req.university || "Not provided"}
+                          </Typography>
+                        </Stack>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Event fontSize="small" color="action" />
+                          <Typography variant="body2" color="text.secondary">
+                            Deadline: {req.deadline || "Flexible"}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                    </Box>
+
+                    {/* Request Details Section */}
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Description color="primary" />
+                        {req.subject}
+                      </Typography>
+
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          mb: 3,
+                          color: "text.primary",
+                          fontStyle: "italic",
+                          backgroundColor: theme.palette.grey[100],
+                          p: 2,
+                          borderRadius: 1,
+                          borderLeft: `3px solid ${theme.palette.primary.main}`,
+                        }}
+                      >
+                        "{req.description}"
+                      </Typography>
+
+                      <Stack
+                        direction={{ xs: "column", sm: "row" }}
+                        spacing={2}
+                        alignItems={{ sm: "center" }}
+                        justifyContent="space-between"
+                      >
+                        <Chip
+                          icon={<Event fontSize="small" />}
+                          label={new Date(req.createdAt).toLocaleString()}
+                          size="small"
+                          variant="outlined"
+                        />
+
+                        <Box
+                          sx={{
+                            display: "flex",
+                            gap: 2,
+                            alignItems: "center",
+                          }}
+                        >
+                          <FormControl size="small" sx={{ minWidth: 160 }}>
+                            <InputLabel>Update Status</InputLabel>
+                            <Select
+                              value={req.status || "Pending"}
+                              label="Update Status"
+                              onChange={(e) =>
+                                handleStatusChange(req._id, e.target.value)
+                              }
+                            >
+                              {Object.keys(statusConfig).map((status) => (
+                                <MenuItem key={status} value={status}>
+                                  <Stack
+                                    direction="row"
+                                    alignItems="center"
+                                    gap={1}
+                                  >
+                                    {statusConfig[status].icon}
+                                    {status}
+                                  </Stack>
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+
+                          <Tooltip title="Delete request">
+                            <IconButton
+                              color="error"
+                              onClick={() => handleDeleteRequest(req._id)}
+                              disabled={deletingId === req._id}
+                            >
+                              {deletingId === req._id ? (
+                                <CircularProgress size={24} />
+                              ) : (
+                                <Delete />
+                              )}
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </Stack>
+                    </Box>
+                  </Box>
+                </Paper>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </Stack>
       )}
     </Box>

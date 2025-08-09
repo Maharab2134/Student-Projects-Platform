@@ -15,46 +15,37 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const stories = [
   {
     name: "Ayesha Rahman",
+    university: "Dhaka University",
     img: "https://randomuser.me/api/portraits/women/44.jpg",
     text: "I sold my first web project here and got a job offer from a local company. Amazing platform!",
   },
   {
     name: "Tanvir Ahmed",
+    university: "BUET ",
     img: "https://randomuser.me/api/portraits/men/32.jpg",
     text: "Student Project Shop helped me find inspiration for my thesis. The ML projects are top-notch.",
   },
   {
     name: "Nusrat Jahan",
+    university: "NSU",
     img: "https://randomuser.me/api/portraits/women/65.jpg",
     text: "I bought an app template and learned so much by customizing it. Highly recommended!",
   },
   {
     name: "Rafiul Islam",
+    university: "AIUB",
     img: "https://randomuser.me/api/portraits/men/43.jpg",
     text: "The support team is very responsive. I found a great React project for my portfolio.",
   },
   {
     name: "Sumaiya Akter",
+    university: "BRAC University",
     img: "https://randomuser.me/api/portraits/women/50.jpg",
     text: "I uploaded my ML project and got valuable feedback from other students.",
   },
   {
     name: "Sabbir Hossain",
-    img: "https://randomuser.me/api/portraits/men/65.jpg",
-    text: "The platform is easy to use and has a wide variety of projects.",
-  },
-  {
-    name: "Rafiul Islam",
-    img: "https://randomuser.me/api/portraits/men/43.jpg",
-    text: "The support team is very responsive. I found a great React project for my portfolio.",
-  },
-  {
-    name: "Sumaiya Akter",
-    img: "https://randomuser.me/api/portraits/women/50.jpg",
-    text: "I uploaded my ML project and got valuable feedback from other students.",
-  },
-  {
-    name: "Sabbir Hossain",
+    university: "IUT (BD)",
     img: "https://randomuser.me/api/portraits/men/65.jpg",
     text: "The platform is easy to use and has a wide variety of projects.",
   },
@@ -161,11 +152,43 @@ export default function SuccessStories() {
                   alt={s.name}
                   sx={{ width: 64, height: 64, mx: "auto", mb: 2 }}
                 />
-                <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight={700}
+                  sx={{ mb: 0.5 }}
+                >
                   {s.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  "{s.text.length > 40 ? s.text.slice(0, 40) + "..." : s.text}"
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mb: 1, display: "block", fontWeight: 500 }}
+                >
+                  {s.university}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    fontStyle: "italic",
+                    mt: 1,
+                    minHeight: 48,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <span
+                    style={{ fontSize: 22, marginRight: 4, color: "#1976d2" }}
+                  >
+                    &ldquo;
+                  </span>
+                  {s.text.length > 80 ? s.text.slice(0, 80) + "..." : s.text}
+                  <span
+                    style={{ fontSize: 22, marginLeft: 4, color: "#1976d2" }}
+                  >
+                    &rdquo;
+                  </span>
                 </Typography>
               </CardContent>
             </Card>

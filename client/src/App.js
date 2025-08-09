@@ -96,6 +96,8 @@ function App() {
     const saved = localStorage.getItem("cart");
     return saved ? JSON.parse(saved) : [];
   });
+  const [projectRatings, setProjectRatings] = useState([]);
+
   const [myOrders, setMyOrders] = useState([]);
   const [page, setPage] = useState("home");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -156,6 +158,12 @@ function App() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [page]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/project-ratings")
+      .then((res) => setProjectRatings(res.data));
+  }, [projects]);
 
   // Handlers
   const handleLogin = async (e) => {
@@ -443,6 +451,7 @@ function App() {
                   openLogin={() => setLoginOpen(true)}
                   selectedCategory={selectedCategory}
                   search={search}
+                  projectRatings={projectRatings}
                 />
               </section>
               {user && <CustomProjectModal user={user} />}
@@ -475,8 +484,9 @@ function App() {
           )}
 
           {user && !user.isAdmin && page === "orders" && (
-            <OrdersPage myOrders={myOrders} />
+            <OrdersPage myOrders={myOrders} user={user} />
           )}
+
           {user && !user.isAdmin && page === "profile" && (
             <ProfilePage
               user={user}

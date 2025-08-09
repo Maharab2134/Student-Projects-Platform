@@ -10,6 +10,8 @@ import {
   Step,
   StepLabel,
   Stack,
+  IconButton,
+  Collapse,
 } from "@mui/material";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import ErrorIcon from "@mui/icons-material/Error";
@@ -18,10 +20,10 @@ import DoneAllIcon from "@mui/icons-material/DoneAll";
 import WorkIcon from "@mui/icons-material/Work";
 import PaymentIcon from "@mui/icons-material/Payment";
 import Tilt from "react-parallax-tilt";
-import Collapse from "@mui/material/Collapse";
-import IconButton from "@mui/material/IconButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import Rating from "@mui/material/Rating";
+import axios from "axios";
 
 const steps = [
   {
@@ -61,8 +63,23 @@ const steps = [
     icon: <DoneAllIcon color="success" />,
   },
 ];
-export default function OrdersPage({ myOrders }) {
+
+export default function OrdersPage({ myOrders, user }) {
   const [openStatusTree, setOpenStatusTree] = React.useState(false);
+  const [ratings, setRatings] = React.useState({});
+
+  const handleRate = async (orderId, newValue) => {
+    setRatings((prev) => ({ ...prev, [orderId]: newValue }));
+    try {
+      await axios.post(
+        `http://localhost:5000/api/order/${orderId}/rate`,
+        { rating: newValue },
+        { headers: { Authorization: user.token } }
+      );
+    } catch (err) {
+      alert("Failed to save rating");
+    }
+  };
 
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto", mt: 4 }}>
@@ -221,6 +238,32 @@ export default function OrdersPage({ myOrders }) {
                   sx={{ mt: 0.5, fontSize: 15 }}
                 >
                   Total: BDT {o.total}k
+                </Typography>
+                {/* User Rating */}
+                {["Delivery", "Complete"].includes(o.status) && (
+                  <>
+                    <Rating
+                      name={`order-rating-${o._id}`}
+                      value={ratings[o._id] || o.rating || 0}
+                      onChange={(_, newValue) => handleRate(o._id, newValue)}
+                      size="small"
+                      sx={{ mt: 1 }}
+                    />
+                    <Typography variant="caption" color="text.secondary">
+                      {ratings[o._id] || o.rating
+                        ? `You rated: ${ratings[o._id] || o.rating} star${
+                            (ratings[o._id] || o.rating) > 1 ? "s" : ""
+                          }`
+                        : "Rate this order"}
+                    </Typography>
+                  </>
+                )}
+                <Typography variant="caption" color="text.secondary">
+                  {ratings[o._id] || o.rating
+                    ? `You rated: ${ratings[o._id] || o.rating} star${
+                        (ratings[o._id] || o.rating) > 1 ? "s" : ""
+                      }`
+                    : "Rate this order"}
                 </Typography>
               </Box>
             </Tilt>

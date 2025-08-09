@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Typography, Button, Chip, Tooltip, Stack } from "@mui/material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { motion } from "framer-motion";
+import Rating from "@mui/material/Rating";
 
 export default function ProjectGrid({
   projects,
@@ -10,7 +11,10 @@ export default function ProjectGrid({
   openLogin,
   selectedCategory,
   search,
+  projectRatings,
 }) {
+  const [expandedDesc, setExpandedDesc] = useState(null);
+
   const filtered = projects.filter(
     (p) =>
       (!selectedCategory || p.category === selectedCategory) &&
@@ -116,6 +120,7 @@ export default function ProjectGrid({
                 flexGrow: 1,
                 display: "flex",
                 flexDirection: "column",
+                maxWidth: "100%",
               }}
             >
               <Typography
@@ -128,33 +133,66 @@ export default function ProjectGrid({
                   overflow: "hidden",
                   whiteSpace: "nowrap",
                   textOverflow: "ellipsis",
+                  width: "100%",
                 }}
               >
                 {project.title}
               </Typography>
 
+              {/* Expand/Collapse Description */}
               <Typography
                 variant="body2"
                 sx={{
                   color: (theme) =>
                     theme.palette.mode === "dark" ? "#fff" : "#333",
                   minHeight: 44,
-                  maxHeight: 44,
-                  overflow: "hidden",
+                  maxHeight: expandedDesc === project._id ? "none" : 44,
+                  overflow: expandedDesc === project._id ? "visible" : "hidden",
                   display: "-webkit-box",
-                  WebkitLineClamp: 2,
+                  WebkitLineClamp: expandedDesc === project._id ? "unset" : 2,
                   WebkitBoxOrient: "vertical",
                   mb: 1.5,
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  wordBreak: "break-word",
+                  width: "100%",
+                  textAlign: "justify", // <-- add this line
                 }}
+                onClick={() =>
+                  setExpandedDesc(
+                    expandedDesc === project._id ? null : project._id
+                  )
+                }
               >
-                {project.desc}
+                {expandedDesc === project._id
+                  ? project.desc
+                  : project.desc.length > 90
+                  ? project.desc.slice(0, 90) + "..."
+                  : project.desc}
+                {project.desc.length > 90 && (
+                  <span
+                    style={{
+                      color: "#1976d2",
+                      marginLeft: 4,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {expandedDesc === project._id ? " Show less" : " Read more"}
+                  </span>
+                )}
               </Typography>
 
-              {/* Category and Language */}
+              {/* Category, Language, Sold, Duration, Rating */}
               <Stack
                 direction="row"
                 spacing={1}
-                sx={{ mb: 2, flexWrap: "wrap" }}
+                rowGap={1.5}
+                sx={{
+                  mb: 2,
+                  flexWrap: "wrap",
+                  width: "100%",
+                  alignItems: "center",
+                }}
               >
                 <Chip
                   label={project.category}
@@ -179,20 +217,16 @@ export default function ProjectGrid({
                     }}
                   />
                 ))}
-                {/* Sold/Soild Chip */}
-                {project.sold && (
-                  <Chip
-                    label={`Sold: ${project.sold}`}
-                    size="small"
-                    sx={{
-                      fontSize: 12,
-                      bgcolor: "#f3ebecff",
-                      color: "#b71c1c",
-                      fontWeight: 600,
-                    }}
-                  />
-                )}
-                {/* Duration Chip */}
+                <Chip
+                  label={`Sold: ${project.sold || 0}K`}
+                  size="small"
+                  sx={{
+                    fontSize: 12,
+                    bgcolor: "#f3ebecff",
+                    color: "#b71c1c",
+                    fontWeight: 600,
+                  }}
+                />
                 {project.duration && (
                   <Chip
                     label={project.duration}
@@ -200,10 +234,35 @@ export default function ProjectGrid({
                     sx={{
                       fontSize: 12,
                       bgcolor: "#1976d2",
-                      color: "#fff", 
+                      color: "#fff",
                       fontWeight: 600,
                     }}
                   />
+                )}
+                {projectRatings && (
+                  <Tooltip
+                    title={(() => {
+                      const r = projectRatings.find(
+                        (r) => r.projectId === project._id
+                      );
+                      return r && r.ratingCount > 0
+                        ? `Average rating from ${r.ratingCount} order(s)`
+                        : "No ratings yet";
+                    })()}
+                  >
+                    <span>
+                      <Rating
+                        value={
+                          projectRatings.find(
+                            (r) => r.projectId === project._id
+                          )?.averageRating * 1 || 0
+                        }
+                        precision={0.1}
+                        readOnly
+                        size="small"
+                      />
+                    </span>
+                  </Tooltip>
                 )}
               </Stack>
 

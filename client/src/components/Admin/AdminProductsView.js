@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -13,9 +13,18 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Chip,
+  IconButton,
 } from "@mui/material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import Autocomplete from "@mui/material/Autocomplete";
 
 const CATEGORIES = ["Web", "App", "ML"];
 const LANGUAGES = [
@@ -28,6 +37,14 @@ const LANGUAGES = [
   "Swift",
   "Other",
 ];
+const DURATION_OPTIONS = [
+  "7 days",
+  "10 days",
+  "15 days",
+  "1 month",
+  "2 months",
+  "Other",
+];
 
 export default function AdminProductsView({
   projects,
@@ -37,6 +54,29 @@ export default function AdminProductsView({
   newProject,
   setNewProject,
 }) {
+  const [editingProject, setEditingProject] = useState(null);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+  const handleEditClick = (project) => {
+    setEditingProject({ ...project });
+    setOpenEditDialog(true);
+  };
+
+  const handleEditSubmit = () => {
+    onUpdate(editingProject._id, editingProject);
+    setOpenEditDialog(false);
+  };
+
+  const handleDeleteClick = (id) => {
+    setDeleteConfirm(id);
+  };
+
+  const confirmDelete = () => {
+    onDelete(deleteConfirm);
+    setDeleteConfirm(null);
+  };
+
   return (
     <Box>
       <Typography
@@ -47,54 +87,71 @@ export default function AdminProductsView({
       >
         Manage Products
       </Typography>
-      <Box
-        component="form"
-        onSubmit={onAdd}
-        sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 3 }}
-      >
-        <TextField
-          label="Title"
-          value={newProject.title}
-          onChange={(e) =>
-            setNewProject((f) => ({ ...f, title: e.target.value }))
-          }
-        />
 
-        <FormControl sx={{ minWidth: 120 }}>
-          <InputLabel>Category</InputLabel>
-          <Select
-            label="Category"
-            value={newProject.category || ""}
+      {/* Add New Product Form */}
+      <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Add New Product
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={onAdd}
+          sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}
+        >
+          <TextField
+            label="Title"
+            value={newProject.title}
             onChange={(e) =>
-              setNewProject((f) => ({ ...f, category: e.target.value }))
+              setNewProject((f) => ({ ...f, title: e.target.value }))
             }
-          >
-            {CATEGORIES.map((cat) => (
-              <MenuItem key={cat} value={cat}>
-                {cat}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl sx={{ minWidth: 160 }}>
-          <InputLabel>Language</InputLabel>
-          <Select
-            label="Language"
-            multiple
-            value={newProject.language || []}
-            onChange={(e) =>
-              setNewProject((f) => ({ ...f, language: e.target.value }))
-            }
-            renderValue={(selected) => selected.join(", ")}
-          >
-            {LANGUAGES.map((lang) => (
-              <MenuItem key={lang} value={lang}>
-                {lang}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl sx={{ minWidth: 10 }}>
+            required
+            sx={{ minWidth: 340 }}
+          />
+
+          <FormControl sx={{ minWidth: 160 }}>
+            <InputLabel>Category</InputLabel>
+            <Select
+              label="Category"
+              value={newProject.category || ""}
+              onChange={(e) =>
+                setNewProject((f) => ({ ...f, category: e.target.value }))
+              }
+              required
+            >
+              {CATEGORIES.map((cat) => (
+                <MenuItem key={cat} value={cat}>
+                  {cat}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl sx={{ minWidth: 160 }}>
+            <InputLabel>Language</InputLabel>
+            <Select
+              label="Language"
+              multiple
+              value={newProject.language || []}
+              onChange={(e) =>
+                setNewProject((f) => ({ ...f, language: e.target.value }))
+              }
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip key={value} label={value} size="small" />
+                  ))}
+                </Box>
+              )}
+              required
+            >
+              {LANGUAGES.map((lang) => (
+                <MenuItem key={lang} value={lang}>
+                  {lang}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <TextField
             label="Price"
             type="number"
@@ -102,99 +159,163 @@ export default function AdminProductsView({
             onChange={(e) =>
               setNewProject((f) => ({ ...f, price: e.target.value }))
             }
+            required
+            sx={{ minWidth: 120, maxWidth: 150 }}
+            inputProps={{ min: 0 }}
           />
-        </FormControl>
-        <TextField
-          label="Image URL"
-          value={newProject.img}
-          onChange={(e) =>
-            setNewProject((f) => ({ ...f, img: e.target.value }))
-          }
-        />
-        <TextField
-          label="Duration"
-          value={newProject.duration || ""}
-          onChange={(e) =>
-            setNewProject((f) => ({ ...f, duration: e.target.value }))
-          }
-        />
-        <TextField
-          label="Sold"
-          type="number"
-          value={newProject.sold || ""}
-          onChange={(e) =>
-            setNewProject((f) => ({ ...f, sold: e.target.value }))
-          }
-          sx={{ minWidth: 100 }}
-        />
-        <TextField
-          label="Description"
-          value={newProject.desc}
-          onChange={(e) =>
-            setNewProject((f) => ({ ...f, desc: e.target.value }))
-          }
-          multiline
-          minRows={2}
-          maxRows={4}
-          fullWidth
-          sx={{minWidth: 190, maxWidth: 290 }}
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          startIcon={<AddShoppingCartIcon />}
-          sx={{
-            minWidth: 120,
-            maxWidth: 150,
-            alignSelf: "flex-end",
-            height: 45,
-            px: 4,
-            marginBottom: 2,
-          }}
-        >
-          Add
-        </Button>
-      </Box>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Title</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Category</TableCell>
-            <TableCell>Language</TableCell>
-            <TableCell>Price</TableCell>
-            <TableCell>Image</TableCell>
-            <TableCell>Duration</TableCell>
-            <TableCell>Sold</TableCell>
-            <TableCell>Delete</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {projects.map((p) => (
-            <TableRow key={p._id}>
-              <TableCell>
-                <TextField
-                  defaultValue={p.title}
-                  onBlur={(e) =>
-                    onUpdate(p._id, { ...p, title: e.target.value })
-                  }
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  defaultValue={p.desc}
-                  onBlur={(e) =>
-                    onUpdate(p._id, { ...p, desc: e.target.value })
-                  }
-                />
-              </TableCell>
-              <TableCell>
+
+          <TextField
+            label="Image URL"
+            value={newProject.img}
+            onChange={(e) =>
+              setNewProject((f) => ({ ...f, img: e.target.value }))
+            }
+            required
+            sx={{ minWidth: 250 }}
+          />
+
+          <Autocomplete
+            freeSolo
+            options={DURATION_OPTIONS}
+            value={newProject.duration || ""}
+            onChange={(_, value) =>
+              setNewProject((f) => ({ ...f, duration: value }))
+            }
+            onInputChange={(_, value) =>
+              setNewProject((f) => ({ ...f, duration: value }))
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Duration"
+                sx={{ minWidth: 180 }}
+                required
+              />
+            )}
+          />
+
+          <TextField
+            label="Sold"
+            type="number"
+            value={newProject.sold || 0}
+            onChange={(e) =>
+              setNewProject((f) => ({ ...f, sold: e.target.value }))
+            }
+            sx={{ minWidth: 100, maxWidth: 140 }}
+            inputProps={{ min: 0 }}
+          />
+
+          <TextField
+            label="Description"
+            value={newProject.desc}
+            onChange={(e) =>
+              setNewProject((f) => ({ ...f, desc: e.target.value }))
+            }
+            multiline
+            minRows={1}
+            fullWidth
+            required
+            sx={{ minWidth: 300, maxWidth: 450 }}
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            startIcon={<AddShoppingCartIcon />}
+            sx={{
+              mt: 1,
+              px: 4,
+              height: 45,
+            }}
+          >
+            Add Product
+          </Button>
+        </Box>
+      </Paper>
+
+      {/* Products Table */}
+      <Paper elevation={3}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Title</TableCell>
+              <TableCell>Category</TableCell>
+              <TableCell>Languages</TableCell>
+              <TableCell>Price</TableCell>
+              <TableCell>Duration</TableCell>
+              <TableCell>Sold</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {projects.map((p) => (
+              <TableRow key={p._id}>
+                <TableCell>{p.title}</TableCell>
+                <TableCell>{p.category}</TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {p.language?.map((lang) => (
+                      <Chip key={lang} label={lang} size="small" />
+                    ))}
+                  </Box>
+                </TableCell>
+                <TableCell>BDT {p.price}K</TableCell>
+                <TableCell>{p.duration}</TableCell>
+                <TableCell>{p.sold || 0}</TableCell>
+                <TableCell>
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleEditClick(p)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={() => handleDeleteClick(p._id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Paper>
+
+      {/* Edit Dialog */}
+      <Dialog
+        open={openEditDialog}
+        onClose={() => setOpenEditDialog(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Edit Product</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}>
+            <TextField
+              label="Title"
+              value={editingProject?.title || ""}
+              sx={{ flex: 1, minWidth: 150, maxWidth: 710 }}
+              onChange={(e) =>
+                setEditingProject((f) => ({ ...f, title: e.target.value }))
+              }
+              fullWidth
+              required
+            />
+
+            <Box sx={{ display: "flex", gap: 10 }}>
+              <FormControl sx={{ flex: 1, minWidth: 150 }}>
+                <InputLabel>Category</InputLabel>
                 <Select
-                  value={p.category || ""}
+                  label="Category"
+                  value={editingProject?.category || ""}
                   onChange={(e) =>
-                    onUpdate(p._id, { ...p, category: e.target.value })
+                    setEditingProject((f) => ({
+                      ...f,
+                      category: e.target.value,
+                    }))
                   }
-                  sx={{ minWidth: 80 }}
+                  required
                 >
                   {CATEGORIES.map((cat) => (
                     <MenuItem key={cat} value={cat}>
@@ -202,16 +323,28 @@ export default function AdminProductsView({
                     </MenuItem>
                   ))}
                 </Select>
-              </TableCell>
-              <TableCell>
+              </FormControl>
+
+              <FormControl sx={{ flex: 1, minWidth: 150 }}>
+                <InputLabel>Language</InputLabel>
                 <Select
+                  label="Language"
                   multiple
-                  value={p.language || []}
+                  value={editingProject?.language || []}
                   onChange={(e) =>
-                    onUpdate(p._id, { ...p, language: e.target.value })
+                    setEditingProject((f) => ({
+                      ...f,
+                      language: e.target.value,
+                    }))
                   }
-                  sx={{ minWidth: 100 }}
-                  renderValue={(selected) => selected.join(", ")}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                      {selected.map((value) => (
+                        <Chip key={value} label={value} size="small" />
+                      ))}
+                    </Box>
+                  )}
+                  required
                 >
                   {LANGUAGES.map((lang) => (
                     <MenuItem key={lang} value={lang}>
@@ -219,51 +352,102 @@ export default function AdminProductsView({
                     </MenuItem>
                   ))}
                 </Select>
-              </TableCell>
-              <TableCell>
-                <TextField
-                  type="number"
-                  defaultValue={p.price}
-                  onBlur={(e) =>
-                    onUpdate(p._id, { ...p, price: e.target.value })
-                  }
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  defaultValue={p.img}
-                  onBlur={(e) => onUpdate(p._id, { ...p, img: e.target.value })}
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  defaultValue={p.duration || ""}
-                  onBlur={(e) =>
-                    onUpdate(p._id, { ...p, duration: e.target.value })
-                  }
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  defaultValue={p.sold || ""}
-                  onBlur={(e) =>
-                    onUpdate(p._id, { ...p, sold: e.target.value })
-                  }
-                />
-              </TableCell>
-              <TableCell>
-                <Button
-                  color="error"
-                  startIcon={<DeleteIcon />}
-                  onClick={() => onDelete(p._id)}
-                >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+              </FormControl>
+            </Box>
+            <Box sx={{ display: "flex", gap: 20 }}>
+              <TextField
+                label="Price"
+                type="number"
+                value={editingProject?.price || 0}
+                onChange={(e) =>
+                  setEditingProject((f) => ({ ...f, price: e.target.value }))
+                }
+                required
+                inputProps={{ min: 0 }}
+                sx={{ flex: 1, minWidth: 120, maxWidth: 180 }}
+              />
+
+              <Autocomplete
+                freeSolo
+                options={DURATION_OPTIONS}
+                value={editingProject?.duration || ""}
+                onChange={(_, value) =>
+                  setEditingProject((f) => ({ ...f, duration: value }))
+                }
+                onInputChange={(_, value) =>
+                  setEditingProject((f) => ({ ...f, duration: value }))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Duration"
+                    sx={{ flex: 1, minWidth: 120, maxWidth: 180 }}
+                  />
+                )}
+                sx={{ flex: 0.3 }}
+              />
+
+              <TextField
+                label="Sold"
+                type="number"
+                value={editingProject?.sold || 0}
+                onChange={(e) =>
+                  setEditingProject((f) => ({ ...f, sold: e.target.value }))
+                }
+                sx={{ flex: 1, minWidth: 120, maxWidth: 180 }}
+                InputProps={{
+                  endAdornment: <span style={{ marginLeft: 4 }}>k</span>,
+                }}
+              />
+            </Box>
+
+            <TextField
+              label="Image URL"
+              value={editingProject?.img || ""}
+              onChange={(e) =>
+                setEditingProject((f) => ({ ...f, img: e.target.value }))
+              }
+              fullWidth
+              required
+            />
+
+            <TextField
+              label="Description"
+              value={editingProject?.desc || ""}
+              onChange={(e) =>
+                setEditingProject((f) => ({ ...f, desc: e.target.value }))
+              }
+              multiline
+              minRows={3}
+              fullWidth
+              required
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+          <Button onClick={handleEditSubmit} variant="contained">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={Boolean(deleteConfirm)}
+        onClose={() => setDeleteConfirm(null)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this product?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirm(null)}>Cancel</Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

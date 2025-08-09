@@ -39,8 +39,9 @@ const Project = mongoose.model(
     img: String,
     category: String,
     language: [String],
-    sold: [String],
+    sold: { type: String, default: "0" },
     duration: String,
+    rating: { type: Number, default: 0 }, // average rating
   })
 );
 
@@ -52,6 +53,7 @@ const Order = mongoose.model(
     total: Number,
     paymentMethod: String,
     transactionId: String,
+    rating: { type: Number, default: 0 },
     status: { type: String, default: "pending" },
     createdAt: { type: Date, default: Date.now },
   })
@@ -191,6 +193,61 @@ app.put("/api/profile", auth, async (req, res) => {
   }
 });
 
+// User give rating in project.
+app.post("/api/order/:id/rate", auth, async (req, res) => {
+  const { rating } = req.body;
+  if (!rating) return res.status(400).json({ error: "Rating required" });
+  await Order.findByIdAndUpdate(req.params.id, { rating });
+
+  // Update average rating for each project in this order
+  const order = await Order.findById(req.params.id);
+  if (order) {
+    for (const p of order.projects) {
+      const project = await Project.findById(p._id);
+      if (project) {
+        // Find all ratings for this project from orders
+        const ordersWithThisProject = await Order.find({
+          "projects._id": project._id,
+          rating: { $gt: 0 },
+        });
+        const ratings = ordersWithThisProject.map((o) => o.rating);
+        const avg =
+          ratings.length > 0
+            ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+            : 0;
+        project.rating = avg;
+        await project.save();
+      }
+    }
+  }
+
+  res.json({ success: true });
+});
+
+// Get average rating for all projects
+app.get("/api/project-ratings", async (req, res) => {
+  const projects = await Project.find();
+  const orders = await Order.find({ rating: { $gt: 0 } });
+
+  const projectRatings = projects.map((project) => {
+    const relatedOrders = orders.filter((order) =>
+      order.projects.some((p) => p._id == project._id.toString())
+    );
+    const ratings = relatedOrders.map((order) => order.rating);
+    const avg =
+      ratings.length > 0
+        ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(2)
+        : null;
+    return {
+      projectId: project._id.toString(),
+      averageRating: avg,
+      ratingCount: ratings.length,
+    };
+  });
+
+  res.json(projectRatings);
+});
+
 // Get all projects
 app.get("/api/projects", async (req, res) => {
   const projects = await Project.find();
@@ -200,7 +257,6 @@ app.get("/api/projects", async (req, res) => {
 // Admin: add project
 app.post("/api/admin/project", auth, admin, async (req, res) => {
   const { title, desc, price, img, category, language } = req.body;
-  // category: string, language: array of strings
   await Project.create({ title, desc, price, img, category, language });
   res.json({ success: true });
 });
@@ -233,6 +289,29 @@ app.post("/api/order", auth, async (req, res) => {
   const { projects, total, paymentMethod, transactionId } = req.body;
   if (!projects || !total || !paymentMethod || !transactionId)
     return res.status(400).send("Missing fields");
+
+  for (const p of projects) {
+    let project = await Project.findOne({ _id: p._id });
+    if (!project) {
+      project = await Project.create({
+        _id: p._id,
+        title: p.title,
+        desc: p.desc,
+        price: p.price,
+        img: p.img,
+        category: p.category,
+        language: p.language,
+        sold: "1", // as string
+        duration: p.duration,
+        rating: 0,
+      });
+    } else {
+      const currentSold = parseInt(project.sold || "0", 10);
+      project.sold = (currentSold + 1).toString();
+      await project.save();
+    }
+  }
+
   await Order.create({
     userId: req.user.id,
     projects,
@@ -288,6 +367,7 @@ app.post("/api/request", auth, async (req, res) => {
     res.status(500).json({ error: "Failed to submit request." });
   }
 });
+
 // Admin: view all custom requests
 app.get("/api/admin/requests", auth, admin, async (req, res) => {
   const requests = await CustomRequest.find().sort({ createdAt: -1 });
@@ -300,6 +380,7 @@ app.put("/api/admin/order/:id/status", auth, admin, async (req, res) => {
   await Order.findByIdAndUpdate(req.params.id, { status });
   res.json({ success: true });
 });
+
 // Admin: view all orders
 app.get("/api/admin/orders", auth, admin, async (req, res) => {
   const orders = await Order.find().sort({ createdAt: -1 });
