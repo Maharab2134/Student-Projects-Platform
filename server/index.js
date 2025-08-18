@@ -93,6 +93,7 @@ function auth(req, res, next) {
 function admin(req, res, next) {
   if (!req.user.isAdmin) return res.sendStatus(403);
   next();
+  
 }
 
 // Static admin creation (run once)
