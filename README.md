@@ -91,6 +91,3 @@ This will concurrently start both the backend (on port 5000) and the frontend (o
 
 ## License
 This project is licensed under the ISC License.
-
----
-*For more details, see the code and comments in each folder.*
