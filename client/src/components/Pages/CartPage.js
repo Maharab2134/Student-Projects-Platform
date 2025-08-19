@@ -9,12 +9,13 @@ import {
   Button,
   Switch,
   useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
   ShoppingCartCheckout as ShoppingCartCheckoutIcon,
   LightMode as LightModeIcon,
-  DarkMode as DarkModeIcon
+  DarkMode as DarkModeIcon,
 } from "@mui/icons-material";
 import { motion, AnimatePresence } from "framer-motion";
 import { styled } from "@mui/system";
@@ -36,8 +37,9 @@ const StyledCartItem = styled(motion.div)(({ theme }) => ({
 
 export default function CartPage({ cart, removeFromCart, handleBuy, setPage }) {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [darkMode, setDarkMode] = useState(false);
-  
+
   const total = cart.reduce((sum, p) => sum + p.price, 0);
 
   const toggleDarkMode = () => {
@@ -66,25 +68,32 @@ export default function CartPage({ cart, removeFromCart, handleBuy, setPage }) {
         gap: 2,
       }}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Typography
           variant="h4"
           fontWeight={800}
           sx={{
-            background: theme.palette.mode === 'dark' 
-              ? 'linear-gradient(45deg, #FF8E53 30%, #FE6B8B 90%)'
-              : 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+            background:
+              theme.palette.mode === "dark"
+                ? "linear-gradient(45deg, #FF8E53 30%, #FE6B8B 90%)"
+                : "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
         >
           My Shopping Cart
         </Typography>
-        
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {theme.palette.mode === 'dark' ? <DarkModeIcon /> : <LightModeIcon />}
-          <Switch 
-            checked={theme.palette.mode === 'dark'}
+
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {theme.palette.mode === "dark" ? <DarkModeIcon /> : <LightModeIcon />}
+          <Switch
+            checked={theme.palette.mode === "dark"}
             onChange={toggleDarkMode}
             color="primary"
             sx={{ ml: 1 }}
@@ -116,17 +125,13 @@ export default function CartPage({ cart, removeFromCart, handleBuy, setPage }) {
             }}
           >
             <ShoppingCartCheckoutIcon
-              sx={{ 
-                fontSize: 60, 
-                color: theme.palette.text.secondary 
+              sx={{
+                fontSize: 60,
+                color: theme.palette.text.secondary,
               }}
             />
           </motion.div>
-          <Typography 
-            variant="h6" 
-            color="text.secondary" 
-            sx={{ mt: 2 }}
-          >
+          <Typography variant="h6" color="text.secondary" sx={{ mt: 2 }}>
             Your cart feels lonely...
           </Typography>
           <Button
@@ -134,10 +139,10 @@ export default function CartPage({ cart, removeFromCart, handleBuy, setPage }) {
             sx={{
               mt: 3,
               borderRadius: "12px",
-              borderWidth: '2px',
-              '&:hover': {
-                borderWidth: '2px',
-              }
+              borderWidth: "2px",
+              "&:hover": {
+                borderWidth: "2px",
+              },
             }}
             onClick={() => setPage("home")}
             component={motion.div}
@@ -191,9 +196,10 @@ export default function CartPage({ cart, removeFromCart, handleBuy, setPage }) {
                       onClick={() => removeFromCart(p._id)}
                       sx={{
                         "&:hover": {
-                          background: theme.palette.mode === 'dark' 
-                            ? 'rgba(255, 0, 0, 0.2)'
-                            : 'rgba(255, 0, 0, 0.1)',
+                          background:
+                            theme.palette.mode === "dark"
+                              ? "rgba(255, 0, 0, 0.2)"
+                              : "rgba(255, 0, 0, 0.1)",
                         },
                       }}
                     >
@@ -235,9 +241,10 @@ export default function CartPage({ cart, removeFromCart, handleBuy, setPage }) {
               fontWeight={700}
               fontSize={20}
               sx={{
-                background: theme.palette.mode === 'dark'
-                  ? 'linear-gradient(45deg, #64B5F6 30%, #4FC3F7 90%)'
-                  : 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                background:
+                  theme.palette.mode === "dark"
+                    ? "linear-gradient(45deg, #64B5F6 30%, #4FC3F7 90%)"
+                    : "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -261,9 +268,10 @@ export default function CartPage({ cart, removeFromCart, handleBuy, setPage }) {
               boxShadow: theme.shadows[2],
               textTransform: "none",
               letterSpacing: "0.5px",
-              background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(45deg, #1565C0 30%, #0D47A1 90%)'
-                : 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+              background:
+                theme.palette.mode === "dark"
+                  ? "linear-gradient(45deg, #1565C0 30%, #0D47A1 90%)"
+                  : "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
             }}
             startIcon={
               <ShoppingCartCheckoutIcon
