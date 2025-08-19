@@ -9,7 +9,6 @@ import {
   Button,
   Switch,
   useTheme,
-  useMediaQuery,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -37,7 +36,6 @@ const StyledCartItem = styled(motion.div)(({ theme }) => ({
 
 export default function CartPage({ cart, removeFromCart, handleBuy, setPage }) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [darkMode, setDarkMode] = useState(false);
 
   const total = cart.reduce((sum, p) => sum + p.price, 0);

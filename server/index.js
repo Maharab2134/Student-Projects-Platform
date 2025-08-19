@@ -54,7 +54,7 @@ const Order = mongoose.model(
     paymentMethod: String,
     transactionId: String,
     rating: { type: Number, default: 0 },
-    status: { type: String, default: "pending" },
+    status: { type: String, default: "Pending" },
     createdAt: { type: Date, default: Date.now },
   })
 );
@@ -93,7 +93,6 @@ function auth(req, res, next) {
 function admin(req, res, next) {
   if (!req.user.isAdmin) return res.sendStatus(403);
   next();
-  
 }
 
 // Static admin creation (run once)
@@ -375,10 +374,34 @@ app.get("/api/admin/requests", auth, admin, async (req, res) => {
   res.json(requests);
 });
 
-// Admin: update custom request status
+// Admin: update Order request status
+const allowedStatuses = [
+  "Pending",
+  "Accepted",
+  "Working",
+  "Delivery",
+  "Complete",
+  "Rejected",
+];
 app.put("/api/admin/order/:id/status", auth, admin, async (req, res) => {
   const { status } = req.body;
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ error: "Invalid status value" });
+  }
   await Order.findByIdAndUpdate(req.params.id, { status });
+  res.json({ success: true });
+});
+
+// Admin: update custom request status
+app.put("/api/admin/request/:id/status", auth, admin, async (req, res) => {
+  const { status } = req.body;
+  await CustomRequest.findByIdAndUpdate(req.params.id, { status });
+  res.json({ success: true });
+});
+// Admin: delete custom request
+app.delete("/api/admin/request/:id", auth, admin, async (req, res) => {
+  console.log("Delete request called for", req.params.id);
+  await CustomRequest.findByIdAndDelete(req.params.id);
   res.json({ success: true });
 });
 

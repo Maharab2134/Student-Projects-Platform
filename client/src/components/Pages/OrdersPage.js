@@ -258,13 +258,6 @@ export default function OrdersPage({ myOrders, user }) {
                     </Typography>
                   </>
                 )}
-                <Typography variant="caption" color="text.secondary">
-                  {ratings[o._id] || o.rating
-                    ? `You rated: ${ratings[o._id] || o.rating} star${
-                        (ratings[o._id] || o.rating) > 1 ? "s" : ""
-                      }`
-                    : "Rate this order"}
-                </Typography>
               </Box>
             </Tilt>
           </Grid>

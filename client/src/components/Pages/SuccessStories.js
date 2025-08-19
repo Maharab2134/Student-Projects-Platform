@@ -8,75 +8,78 @@ import {
   Stack,
   IconButton,
   useTheme,
+  useMediaQuery,
+  Chip,
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import StarIcon from "@mui/icons-material/Star";
+import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 
 const stories = [
   {
     name: "Ayesha Rahman",
     university: "Dhaka University",
-    img: "https://randomuser.me/api/portraits/women/44.jpg",
+    img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cHJvZmVzc2lvbmFsJTIwd29tYW58ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
     text: "I sold my first web project here and got a job offer from a local company. Amazing platform!",
+    rating: 5,
+    field: "Web Development",
   },
   {
-    name: "Tanvir Ahmed",
-    university: "BUET ",
-    img: "https://randomuser.me/api/portraits/men/32.jpg",
+    name: "Ehsanul Haque",
+    university: "BUBT",
+    img: "https://res.cloudinary.com/dyl34zggp/image/upload/v1755613872/image2_uc9odd.jpg",
     text: "Student Project Shop helped me find inspiration for my thesis. The ML projects are top-notch.",
+    rating: 4,
+    field: "App Development",
   },
   {
     name: "Nusrat Jahan",
     university: "NSU",
-    img: "https://randomuser.me/api/portraits/women/65.jpg",
+    img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8d29tYW4lMjBwb3J0cmFpdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
     text: "I bought an app template and learned so much by customizing it. Highly recommended!",
+    rating: 5,
+    field: "Web Development",
   },
   {
-    name: "Rafiul Islam",
-    university: "AIUB",
-    img: "https://randomuser.me/api/portraits/men/43.jpg",
+    name: "Hasanuzzaman Sojeeb",
+    university: "BUBT",
+    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bWFuJTIwcG9ydHJhaXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
     text: "The support team is very responsive. I found a great React project for my portfolio.",
+    rating: 4,
+    field: "Frontend Development",
   },
   {
     name: "Sumaiya Akter",
     university: "BRAC University",
-    img: "https://randomuser.me/api/portraits/women/50.jpg",
+    img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8d29tYW4lMjBwb3J0cmFpdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
     text: "I uploaded my ML project and got valuable feedback from other students.",
+    rating: 5,
+    field: "Data Science",
   },
   {
     name: "Sabbir Hossain",
     university: "IUT (BD)",
-    img: "https://randomuser.me/api/portraits/men/65.jpg",
+    img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bWVuJTIwcG9ydHJhaXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
     text: "The platform is easy to use and has a wide variety of projects.",
+    rating: 4,
+    field: "UI/UX Design",
   },
 ];
 
-function getCardsPerView() {
-  if (window.innerWidth < 600) return 1;
-  if (window.innerWidth < 900) return 2;
-  if (window.innerWidth < 1200) return 3;
-  return 5;
-}
-
-const AUTO_SLIDE_MS = 1000; // 4 seconds
+const AUTO_SLIDE_MS = 5000; // 5 seconds
 
 export default function SuccessStories() {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const [index, setIndex] = useState(0);
-  const [cardsPerView, setCardsPerView] = useState(getCardsPerView());
   const [isHovered, setIsHovered] = useState(false);
 
-  // Responsive cards per view
-  useEffect(() => {
-    const update = () => {
-      setCardsPerView(getCardsPerView());
-      setIndex((prev) =>
-        Math.min(prev, Math.max(0, stories.length - getCardsPerView()))
-      );
-    };
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
+  // Determine cards per view based on screen size
+  let cardsPerView = 3; // default
+  if (isMobile) cardsPerView = 1;
+  else if (isTablet) cardsPerView = 2;
 
   // Auto-slide
   useEffect(() => {
@@ -101,57 +104,211 @@ export default function SuccessStories() {
   const currentStories = stories.slice(index, index + cardsPerView);
 
   // Colors for day/night
-  const cardBg = theme.palette.mode === "dark" ? "#232b36" : "#fff";
-  const btnBg = theme.palette.mode === "dark" ? "#2a3748" : "#f4f8fb";
-  const btnHover = theme.palette.mode === "dark" ? "#1976d2" : "#e3f2fd";
-  const btnColor = theme.palette.mode === "dark" ? "#fff" : "#1976d2";
+  const cardBg = theme.palette.mode === "dark" ? "#2a3441" : "#ffffff";
+  const sectionBg = theme.palette.mode === "dark" ? "#1a202c" : "#f8fafc";
+  const accentColor = theme.palette.mode === "dark" ? "#4f8ff0" : "#2563eb";
 
   return (
-    <Box sx={{ my: 6 }}>
+    <Box
+      sx={{
+        py: 8,
+        px: 2,
+        backgroundColor: sectionBg,
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Decorative elements */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: -100,
+          right: -100,
+          width: 300,
+          height: 300,
+          borderRadius: "50%",
+          backgroundColor:
+            theme.palette.mode === "dark"
+              ? "rgba(37, 99, 235, 0.1)"
+              : "rgba(37, 99, 235, 0.05)",
+          zIndex: 0,
+        }}
+      />
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: -50,
+          left: -50,
+          width: 200,
+          height: 200,
+          borderRadius: "50%",
+          backgroundColor:
+            theme.palette.mode === "dark"
+              ? "rgba(37, 99, 235, 0.1)"
+              : "rgba(37, 99, 235, 0.05)",
+          zIndex: 0,
+        }}
+      />
+
       <Typography
-        variant="h4"
+        variant="h3"
         fontWeight={800}
         align="center"
         color="primary"
-        sx={{ mb: 3 }}
+        sx={{
+          mb: 2,
+          position: "relative",
+          zIndex: 1,
+        }}
       >
         Success Stories
       </Typography>
+
+      <Typography
+        variant="body1"
+        align="center"
+        color="text.secondary"
+        sx={{
+          maxWidth: 600,
+          mx: "auto",
+          mb: 5,
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
+        Discover how students are achieving their goals and advancing their
+        careers with our platform
+      </Typography>
+
       <Box
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        sx={{ position: "relative", zIndex: 1 }}
       >
+        {/* Navigation Arrows */}
+        <IconButton
+          onClick={handlePrev}
+          disabled={index === 0}
+          sx={{
+            position: "absolute",
+            left: { xs: 0, md: -50 },
+            top: "50%",
+            transform: "translateY(-50%)",
+            backgroundColor: theme.palette.background.paper,
+            color: accentColor,
+            boxShadow: 2,
+            "&:hover": {
+              backgroundColor: accentColor,
+              color: "#fff",
+            },
+            zIndex: 2,
+            display: { xs: "none", md: "flex" },
+          }}
+        >
+          <ArrowBackIosNewIcon />
+        </IconButton>
+
+        <IconButton
+          onClick={handleNext}
+          disabled={index >= stories.length - cardsPerView}
+          sx={{
+            position: "absolute",
+            right: { xs: 0, md: -50 },
+            top: "50%",
+            transform: "translateY(-50%)",
+            backgroundColor: theme.palette.background.paper,
+            color: accentColor,
+            boxShadow: 2,
+            "&:hover": {
+              backgroundColor: accentColor,
+              color: "#fff",
+            },
+            zIndex: 2,
+            display: { xs: "none", md: "flex" },
+          }}
+        >
+          <ArrowForwardIosIcon />
+        </IconButton>
+
         <Stack
           direction="row"
           spacing={3}
           justifyContent="center"
           alignItems="stretch"
-          sx={{ width: { xs: "100%", md: 1100 }, mx: "auto" }}
+          sx={{
+            width: { xs: "100%", md: "90%" },
+            mx: "auto",
+            position: "relative",
+          }}
         >
           {currentStories.map((s, i) => (
             <Card
               key={s.name + i}
               sx={{
                 flex: 1,
-                minWidth: 220,
-                maxWidth: 320,
+                minWidth: 280,
+                maxWidth: 380,
                 mx: "auto",
-                borderRadius: 3,
-                boxShadow: 3,
+                borderRadius: 4,
+                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.08)",
                 bgcolor: cardBg,
                 transition: "transform 0.3s, box-shadow 0.3s",
+                position: "relative",
+                overflow: "visible",
                 "&:hover": {
-                  transform: "translateY(-6px) scale(1.03)",
-                  boxShadow: 6,
+                  transform: "translateY(-8px)",
+                  boxShadow: "0 15px 35px rgba(0, 0, 0, 0.12)",
                 },
               }}
             >
-              <CardContent sx={{ textAlign: "center" }}>
+              {/* Quote icon */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: -20,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: 60,
+                  height: 60,
+                  borderRadius: "50%",
+                  backgroundColor: accentColor,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  boxShadow: 2,
+                }}
+              >
+                <FormatQuoteIcon sx={{ fontSize: 30 }} />
+              </Box>
+
+              <CardContent sx={{ textAlign: "center", pt: 5, pb: 3 }}>
                 <Avatar
                   src={s.img}
                   alt={s.name}
-                  sx={{ width: 64, height: 64, mx: "auto", mb: 2 }}
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    mx: "auto",
+                    mb: 2,
+                    border: `3px solid ${accentColor}`,
+                    boxShadow: 2,
+                  }}
                 />
+
+                {/* Rating stars */}
+                <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
+                  {[...Array(5)].map((_, starIndex) => (
+                    <StarIcon
+                      key={starIndex}
+                      sx={{
+                        fontSize: 18,
+                        color: starIndex < s.rating ? "#ffc107" : "#e0e0e0",
+                      }}
+                    />
+                  ))}
+                </Box>
+
                 <Typography
                   variant="subtitle1"
                   fontWeight={700}
@@ -159,6 +316,7 @@ export default function SuccessStories() {
                 >
                   {s.name}
                 </Typography>
+
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -166,26 +324,53 @@ export default function SuccessStories() {
                 >
                   {s.university}
                 </Typography>
+
+                <Chip
+                  label={s.field}
+                  size="small"
+                  sx={{
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? "rgba(79, 143, 240, 0.2)"
+                        : "rgba(37, 99, 235, 0.1)",
+                    color: accentColor,
+                    fontWeight: 500,
+                    mb: 2,
+                    fontSize: "0.7rem",
+                  }}
+                />
+
                 <Typography
                   variant="body2"
                   color="text.secondary"
                   sx={{
                     fontStyle: "italic",
                     mt: 1,
-                    minHeight: 48,
+                    minHeight: 70,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    lineHeight: 1.6,
                   }}
                 >
                   <span
-                    style={{ fontSize: 22, marginRight: 4, color: "#1976d2" }}
+                    style={{
+                      fontSize: 24,
+                      marginRight: 6,
+                      color: accentColor,
+                      lineHeight: 0,
+                    }}
                   >
                     &ldquo;
                   </span>
-                  {s.text.length > 80 ? s.text.slice(0, 80) + "..." : s.text}
+                  {s.text}
                   <span
-                    style={{ fontSize: 22, marginLeft: 4, color: "#1976d2" }}
+                    style={{
+                      fontSize: 24,
+                      marginLeft: 6,
+                      color: accentColor,
+                      lineHeight: 0,
+                    }}
                   >
                     &rdquo;
                   </span>
@@ -195,19 +380,23 @@ export default function SuccessStories() {
           ))}
         </Stack>
 
-        {/* Buttons below */}
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+        {/* Mobile navigation buttons */}
+        <Box
+          sx={{
+            display: { xs: "flex", md: "none" },
+            justifyContent: "center",
+            mt: 4,
+          }}
+        >
           <IconButton
             onClick={handlePrev}
             disabled={index === 0}
             sx={{
               mx: 1,
-              bgcolor: btnBg,
-              color: btnColor,
-              "&:hover": { bgcolor: btnHover, color: "#fff" },
-              border: "1px solid",
-              borderColor: theme.palette.divider,
-              transition: "all 0.2s",
+              bgcolor: "background.paper",
+              color: accentColor,
+              boxShadow: 1,
+              "&:hover": { bgcolor: accentColor, color: "#fff" },
             }}
           >
             <ArrowBackIosNewIcon />
@@ -217,16 +406,38 @@ export default function SuccessStories() {
             disabled={index >= stories.length - cardsPerView}
             sx={{
               mx: 1,
-              bgcolor: btnBg,
-              color: btnColor,
-              "&:hover": { bgcolor: btnHover, color: "#fff" },
-              border: "1px solid",
-              borderColor: theme.palette.divider,
-              transition: "all 0.2s",
+              bgcolor: "background.paper",
+              color: accentColor,
+              boxShadow: 1,
+              "&:hover": { bgcolor: accentColor, color: "#fff" },
             }}
           >
             <ArrowForwardIosIcon />
           </IconButton>
+        </Box>
+
+        {/* Dots indicator */}
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          {Array.from({ length: stories.length - cardsPerView + 1 }).map(
+            (_, i) => (
+              <Box
+                key={i}
+                onClick={() => setIndex(i)}
+                sx={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  mx: 0.5,
+                  backgroundColor: i === index ? accentColor : "grey.400",
+                  cursor: "pointer",
+                  transition: "all 0.3s",
+                  "&:hover": {
+                    backgroundColor: i === index ? accentColor : "grey.600",
+                  },
+                }}
+              />
+            )
+          )}
         </Box>
       </Box>
     </Box>

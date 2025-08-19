@@ -26,8 +26,8 @@ import OrdersPage from "./components/Pages/OrdersPage";
 import BkashPage from "./components/Pages/BkashPage";
 import SuccessStories from "./components/Pages/SuccessStories";
 import CustomProjectModal from "./components/Pages/CustomProjectModal";
-import AdminCustomRequests from "./components/Admin/AdminCustomRequests";
-import MyCustomRequests from "./components/Admin/MyCustomRequests";
+import AdminCustomRequests from "./components/Admin/CustomRequestsView";
+import MyCustomRequests from "./components/Pages/MyCustomRequests";
 import ScrollToTop from "./components/Utility/ScrollToTop";
 
 // Additional imports for ULink pages
@@ -454,7 +454,7 @@ function App() {
                   projectRatings={projectRatings}
                 />
               </section>
-              {user && <CustomProjectModal user={user} />}
+              {user && !user.isAdmin && <CustomProjectModal user={user} />}
               <section
                 style={{
                   padding: "32px 0",
