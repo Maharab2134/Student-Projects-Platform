@@ -34,7 +34,7 @@ const social = [
   },
   {
     icon: <GitHub />,
-    href: "https://github.com/",
+    href: "https://github.com/Maharab2134",
     color: "#333333",
     name: "GitHub",
   },
@@ -46,7 +46,7 @@ const social = [
   },
   {
     icon: <Email />,
-    href: "mailto:maharab@gmail.com",
+    href: "mailto:studentcrafted@gmail.com",
     color: "#ea4335",
     name: "Email",
   },
@@ -202,7 +202,7 @@ export default function Footer({ setPage }) {
             </Box>
 
             {/* Contact information */}
-            <Box sx={{ flex: 1, minWidth: 250, }}>
+            <Box sx={{ flex: 1, minWidth: 250 }}>
               <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>
                 Contact Info
               </Typography>
@@ -211,11 +211,11 @@ export default function Footer({ setPage }) {
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Email sx={{ mr: 1.5, fontSize: 20, opacity: 0.8 }} />
                   <Link
-                    href="mailto:maharab@gmail.com"
+                    href="mailto:studentcrafted@gmail.com"
                     underline="hover"
                     sx={{ color: "#fff", fontWeight: 500 }}
                   >
-                    maharab@gmail.com
+                    studentcrafted@gmail.com
                   </Link>
                 </Box>
 
@@ -293,10 +293,10 @@ export default function Footer({ setPage }) {
                   Business Hours
                 </Typography>
                 <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Sunday - Thursday
+                  Saturday - Friday
                 </Typography>
                 <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  9:00 AM - 6:00 PM
+                  9:30 AM - 10:00 PM
                 </Typography>
               </Box>
             </Box>

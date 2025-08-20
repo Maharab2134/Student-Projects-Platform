@@ -1,4 +1,13 @@
-import { Box, Typography, Divider, Fade, Slide, List, ListItem, ListItemText } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Divider,
+  Fade,
+  Slide,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 
 export default function PrivacyPolicyPage() {
@@ -28,7 +37,15 @@ export default function PrivacyPolicyPage() {
       </Slide>
       <Fade in={show} timeout={1000}>
         <div>
-          <Divider sx={{ mb: 3, mx: "auto", width: 80, borderColor: "primary.main", opacity: 0.4 }} />
+          <Divider
+            sx={{
+              mb: 3,
+              mx: "auto",
+              width: 80,
+              borderColor: "primary.main",
+              opacity: 0.4,
+            }}
+          />
           <Typography
             variant="h6"
             fontWeight={600}
@@ -47,7 +64,9 @@ export default function PrivacyPolicyPage() {
               lineHeight: 1.7,
             }}
           >
-            We are committed to protecting your personal information and your right to privacy. This policy explains how we collect, use, and safeguard your data when you use Student Project Shop.
+            We are committed to protecting your personal information and your
+            right to privacy. This policy explains how we collect, use, and
+            safeguard your data when you use Student Project Shop.
           </Typography>
 
           <Typography
@@ -126,7 +145,9 @@ export default function PrivacyPolicyPage() {
               lineHeight: 1.7,
             }}
           >
-            We use industry-standard security measures, including encryption and secure servers, to protect your personal information. Access to your data is limited to authorized personnel only.
+            We use industry-standard security measures, including encryption and
+            secure servers, to protect your personal information. Access to your
+            data is limited to authorized personnel only.
           </Typography>
 
           <Typography
@@ -147,7 +168,8 @@ export default function PrivacyPolicyPage() {
               lineHeight: 1.7,
             }}
           >
-            We do not sell or share your personal information with third parties, except as required by law or with your explicit consent.
+            We do not sell or share your personal information with third
+            parties, except as required by law or with your explicit consent.
           </Typography>
 
           <Typography
@@ -168,7 +190,9 @@ export default function PrivacyPolicyPage() {
               lineHeight: 1.7,
             }}
           >
-            You can access, update, or delete your personal information at any time from your account settings. You may also contact us to request data removal or to ask questions about your privacy.
+            You can access, update, or delete your personal information at any
+            time from your account settings. You may also contact us to request
+            data removal or to ask questions about your privacy.
           </Typography>
 
           <Typography
@@ -189,7 +213,9 @@ export default function PrivacyPolicyPage() {
               lineHeight: 1.7,
             }}
           >
-            We may update this privacy policy from time to time. We will notify you of any significant changes by posting the new policy on this page.
+            We may update this privacy policy from time to time. We will notify
+            you of any significant changes by posting the new policy on this
+            page.
           </Typography>
 
           <Box sx={{ mt: 4, textAlign: "center" }}>
@@ -201,11 +227,16 @@ export default function PrivacyPolicyPage() {
             >
               Thank you for trusting Student Project Shop.
             </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: "#888", mt: 1 }}
-            >
-              If you have any questions or concerns about your privacy, please contact us at <a href="mailto:your@email.com" style={{ color: "#1976d2", textDecoration: "none" }}>your@email.com</a>.
+            <Typography variant="body2" sx={{ color: "#888", mt: 1 }}>
+              If you have any questions or concerns about your privacy, please
+              contact us at{" "}
+              <a
+                href="mailto:studentcrafted@gmail.com"
+                style={{ color: "#1976d2", textDecoration: "none" }}
+              >
+                studentcrafted@gmail.com
+              </a>
+              .
             </Typography>
           </Box>
         </div>

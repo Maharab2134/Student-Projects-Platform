@@ -1,4 +1,14 @@
-import { Box, Typography, Divider, List, ListItem, ListItemIcon, ListItemText, Fade, Slide } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Divider,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Fade,
+  Slide,
+} from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import GavelIcon from "@mui/icons-material/Gavel";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
@@ -35,7 +45,15 @@ export default function RefundPolicyPage() {
       </Slide>
       <Fade in={show} timeout={1000}>
         <div>
-          <Divider sx={{ mb: 3, mx: "auto", width: 80, borderColor: "primary.main", opacity: 0.4 }} />
+          <Divider
+            sx={{
+              mb: 3,
+              mx: "auto",
+              width: 80,
+              borderColor: "primary.main",
+              opacity: 0.4,
+            }}
+          />
           <Typography
             variant="h6"
             fontWeight={600}
@@ -120,8 +138,11 @@ export default function RefundPolicyPage() {
             }}
           >
             For any questions or to request a refund, please contact us at{" "}
-            <a href="mailto:your@email.com" style={{ color: "#1976d2", textDecoration: "none" }}>
-              your@email.com
+            <a
+              href="mailto:studentcrafted@gmail.com"
+              style={{ color: "#1976d2", textDecoration: "none" }}
+            >
+              studentcrafted@gmail.com{" "}
             </a>
             .
           </Typography>

@@ -60,7 +60,7 @@ export default function ProjectGrid({
       )}
       {filtered.map((project, i) => {
         const shouldTruncateTitle = needsTruncation(project.title);
-        
+
         return (
           <motion.div
             key={project._id}
@@ -143,7 +143,8 @@ export default function ProjectGrid({
                     fontSize: 18,
                     mb: 0.8,
                     overflow: "hidden",
-                    whiteSpace: expandedTitle === project._id ? "normal" : "nowrap",
+                    whiteSpace:
+                      expandedTitle === project._id ? "normal" : "nowrap",
                     textOverflow: "ellipsis",
                     width: "100%",
                     cursor: shouldTruncateTitle ? "pointer" : "default",
@@ -185,7 +186,8 @@ export default function ProjectGrid({
                       theme.palette.mode === "dark" ? "#fff" : "#333",
                     minHeight: 44,
                     maxHeight: expandedDesc === project._id ? "none" : 44,
-                    overflow: expandedDesc === project._id ? "visible" : "hidden",
+                    overflow:
+                      expandedDesc === project._id ? "visible" : "hidden",
                     display: "-webkit-box",
                     WebkitLineClamp: expandedDesc === project._id ? "unset" : 2,
                     WebkitBoxOrient: "vertical",
@@ -215,7 +217,9 @@ export default function ProjectGrid({
                         fontWeight: 600,
                       }}
                     >
-                      {expandedDesc === project._id ? " Show less" : " Read more"}
+                      {expandedDesc === project._id
+                        ? " Show less"
+                        : " Read more"}
                     </span>
                   )}
                 </Typography>
@@ -298,7 +302,7 @@ export default function ProjectGrid({
                             (r) => r.projectId === project._id
                           );
                           return r && r.ratingCount > 0
-                            ? `Average rating from ${r.ratingCount} order(s)`
+                            ? `Average rating from order(s)`
                             : "No ratings yet";
                         })()}
                       >

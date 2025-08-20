@@ -494,6 +494,8 @@ export default function CustomProjectToggleForm({ user }) {
                                     fontSize: 16,
                                     lineHeight: 1.7,
                                     color: "text.primary",
+                                    paddingTop: "12px",
+                                    paddingBottom: "12px",
                                   },
                                 }}
                                 inputProps={{ maxLength: 1000 }}

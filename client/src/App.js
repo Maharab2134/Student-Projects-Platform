@@ -20,6 +20,7 @@ import ProjectGrid from "./components/Utility/ProjectGrid";
 import AdminProductsView from "./components/Admin/AdminProductsView";
 import AdminOrdersView from "./components/Admin/AdminOrdersView";
 import AdminUsersView from "./components/Admin/AdminUsersView";
+import AdminTeamPage from "./components/Admin/AdminTeamPage";
 import ProfilePage from "./components/Pages/ProfilePage";
 import CartPage from "./components/Pages/CartPage";
 import OrdersPage from "./components/Pages/OrdersPage";
@@ -27,7 +28,7 @@ import BkashPage from "./components/Pages/BkashPage";
 import SuccessStories from "./components/Pages/SuccessStories";
 import CustomProjectModal from "./components/Pages/CustomProjectModal";
 import AdminCustomRequests from "./components/Admin/CustomRequestsView";
-import MyCustomRequests from "./components/Pages/MyCustomRequests";
+import ViewCustomRequest from "./components/Pages/ViewCustomRequest";
 import ScrollToTop from "./components/Utility/ScrollToTop";
 
 // Additional imports for ULink pages
@@ -274,7 +275,7 @@ function App() {
       setSnackbar({
         open: true,
         success: true,
-        msg: "Order placed! (bKash simulated)",
+        msg: "Order placed!",
       });
       setCart([]);
       setPage("orders");
@@ -530,8 +531,9 @@ function App() {
             <AdminCustomRequests user={user} />
           )}
           {user && !user.isAdmin && page === "my_custom_requests" && (
-            <MyCustomRequests user={user} />
+            <ViewCustomRequest user={user} />
           )}
+          {user && user.isAdmin && page === "admin_team" && <AdminTeamPage user={user} />}
           {/* ULink Pages */}
 
           {page === "about" && <AboutUsPage user={user} />}

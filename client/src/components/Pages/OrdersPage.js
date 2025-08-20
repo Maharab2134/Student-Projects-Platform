@@ -245,8 +245,13 @@ export default function OrdersPage({ myOrders, user }) {
                     <Rating
                       name={`order-rating-${o._id}`}
                       value={ratings[o._id] || o.rating || 0}
-                      onChange={(_, newValue) => handleRate(o._id, newValue)}
+                      onChange={(_, newValue) => {
+                        if (!o.rating && !ratings[o._id]) {
+                          handleRate(o._id, newValue);
+                        }
+                      }}
                       size="small"
+                      disabled={Boolean(o.rating || ratings[o._id])}
                       sx={{ mt: 1 }}
                     />
                     <Typography variant="caption" color="text.secondary">

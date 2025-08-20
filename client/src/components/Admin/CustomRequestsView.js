@@ -30,6 +30,8 @@ import {
   ArrowForward,
   Delete,
 } from "@mui/icons-material";
+import AppsIcon from "@mui/icons-material/Apps";
+import LanguageIcon from "@mui/icons-material/Language";
 import axios from "axios";
 
 const statusConfig = {
@@ -290,7 +292,13 @@ export default function AdminCustomRequests({ user }) {
                           gap: 1,
                         }}
                       >
-                        <Description color="primary" />
+                        {req.subject === "App" ? (
+                          <AppsIcon color="primary" />
+                        ) : req.subject === "Web" ? (
+                          <LanguageIcon color="primary" />
+                        ) : (
+                          <Description color="primary" />
+                        )}
                         {req.subject}
                       </Typography>
 
@@ -298,12 +306,11 @@ export default function AdminCustomRequests({ user }) {
                         variant="body1"
                         sx={{
                           mb: 3,
-                          color: "text.primary",
                           fontStyle: "italic",
-                          backgroundColor: theme.palette.grey[100],
                           p: 2,
                           borderRadius: 1,
                           borderLeft: `3px solid ${theme.palette.primary.main}`,
+                          borderRight: `3px solid ${theme.palette.primary.main}`,
                         }}
                       >
                         "{req.description}"

@@ -1,276 +1,326 @@
-import { Typography, Avatar, Box, Grid } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  Divider,
+  Grid,
+  Card,
+  CardContent,
+  Container,
+  Avatar,
+  Skeleton,
+} from "@mui/material";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import axios from "axios";
 
-// Updated dummy team data
-const team = [
-  {
-    name: "Md. Rahim Uddin",
-    role: "Founder & CEO",
-    img: "https://randomuser.me/api/portraits/men/32.jpg",
+// Animation variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: "easeOut" },
   },
-  {
-    name: "Fatema Khatun",
-    role: "Lead Developer",
-    img: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-  {
-    name: "Sabbir Hossain",
-    role: "ML Engineer",
-    img: "https://randomuser.me/api/portraits/men/65.jpg",
-  },
-  {
-    name: "Nusrat Jahan",
-    role: "Community Manager",
-    img: "https://randomuser.me/api/portraits/women/68.jpg",
-  },
-  {
-    name: "Rafiul Islam",
-    role: "UI/UX Designer",
-    img: "https://randomuser.me/api/portraits/men/43.jpg",
-  },
-  {
-    name: "Sumaiya Akter",
-    role: "Full Stack Developer",
-    img: "https://randomuser.me/api/portraits/women/50.jpg",
-  },
-];
+};
 
-// Dummy testimonials
-const testimonials = [
-  {
-    name: "Aminul Islam",
-    text: "Student Project Shop helped me find real, quality projects for my thesis. Highly recommended!",
-    img: "https://randomuser.me/api/portraits/men/12.jpg",
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+    },
   },
-  {
-    name: "Shila Akter",
-    text: "I sold my app project here and got great feedback from buyers. The process was smooth and secure.",
-    img: "https://randomuser.me/api/portraits/women/22.jpg",
-  },
-  {
-    name: "Tanvir Hasan",
-    text: "The support team is very responsive and the platform is easy to use.",
-    img: "https://randomuser.me/api/portraits/men/23.jpg",
-  },
-];
+};
 
 const fadeIn = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
 };
 
-export default function AboutUsPage() {
-  const [show, setShow] = useState(false);
+// Helper for fallback image
+const getImageUrl = (img) =>
+  !img || typeof img !== "string" || img.trim() === ""
+    ? "https://randomuser.me/api/portraits/lego/1.jpg"
+    : img;
+
+// --- Team Grid Section ---
+function TeamGrid() {
+  const [team, setTeam] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    setShow(true);
+    axios
+      .get("http://localhost:5000/api/team")
+      .then((res) => {
+        setTeam(res.data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setTeam([]);
+        setLoading(false);
+      });
   }, []);
 
-  return (
-    <Box sx={{ maxWidth: "1100px", mx: "auto", px: 2, py: 4 }}>
-      {/* About Us Heading */}
-      <motion.div
-        variants={fadeIn}
-        initial="hidden"
-        animate={show ? "visible" : "hidden"}
+  // Skeleton loader for team members
+  const SkeletonMember = () => (
+    <Grid item xs={12} sm={6} md={4} lg={3}>
+      <Card
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.05)",
+          border: "1px solid",
+          borderColor: "divider",
+          height: "100%",
+        }}
       >
+        <Skeleton variant="circular" width={100} height={100} sx={{ mb: 2 }} />
+        <Skeleton variant="text" width={80} sx={{ mb: 1 }} />
+        <Skeleton variant="text" width={60} />
+      </Card>
+    </Grid>
+  );
+
+  return (
+    <Box sx={{ mb: 10, mt: 4 }}>
+      <motion.div initial="hidden" animate="visible" variants={fadeIn}>
         <Typography
           variant="h3"
-          fontWeight={800}
-          color="primary"
-          gutterBottom
-          sx={{ textAlign: "center", fontFamily: "Poppins, Inter" }}
-        >
-          About Us
-        </Typography>
-      </motion.div>
-
-      {/* Team Grid */}
-      <Box sx={{ mt: 6 }}>
-        <Typography
-          variant="h5"
           fontWeight={700}
-          color="secondary"
-          gutterBottom
-          sx={{ textAlign: "center" }}
+          color="primary"
+          sx={{
+            mb: 2,
+            textAlign: "center",
+            letterSpacing: 1,
+            background: "linear-gradient(135deg, #1976d2 0%, #115293 100%)",
+            backgroundClip: "text",
+            textFillColor: "transparent",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
         >
           Meet Our Team
         </Typography>
+        <Typography
+          variant="h6"
+          color="text.secondary"
+          sx={{
+            textAlign: "center",
+            maxWidth: 600,
+            mx: "auto",
+            mb: 6,
+            px: 2,
+          }}
+        >
+          The passionate people behind our mission to revolutionize project
+          sharing and collaboration.
+        </Typography>
+      </motion.div>
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         <Grid container spacing={4} justifyContent="center">
-          {team.map((member) => (
-            <Grid item xs={12} sm={6} md={4} key={member.name}>
+          {loading && [1, 2, 3, 4].map((item) => <SkeletonMember key={item} />)}
+
+          {!loading && team.length === 0 && (
+            <Grid item xs={12}>
+              <Typography align="center" color="text.secondary">
+                No team members found.
+              </Typography>
+            </Grid>
+          )}
+
+          {team.map((member, idx) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={member._id || idx}>
               <motion.div
-                variants={fadeIn}
-                initial="hidden"
-                animate={show ? "visible" : "hidden"}
-                whileHover={{ scale: 1.05 }}
+                variants={fadeInUp}
+                whileHover={{
+                  scale: 1.04,
+                  boxShadow: "0 10px 30px -10px rgba(25,118,210,0.15)",
+                }}
+                style={{ height: "100%" }}
               >
-                <Box
+                <Card
                   sx={{
+                    p: 3,
+                    borderRadius: 4,
+                    textAlign: "center",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    p: 2,
+                    justifyContent: "center",
+                    boxShadow: "0 8px 24px rgba(25, 118, 210, 0.08)",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    height: 300,
+                    width: 250,
+                    transition: "all 0.3s cubic-bezier(.4,2,.6,1)",
+                    background:
+                      "linear-gradient(135deg, #f9fafb 0%, #e3f2fd 100%)",
                   }}
                 >
                   <Avatar
-                    src={member.img}
+                    src={getImageUrl(member.img)}
                     alt={member.name}
-                    sx={{
-                      width: 80,
-                      height: 80,
-                      mb: 1,
-                      boxShadow: "0 4px 16px 0 rgba(25,118,210,0.10)",
+                    style={{
+                      width: 120,
+                      height: 120,
+                      marginBottom: 16,
+                      border: "3px solid #1976d2",
+                      boxShadow: "0 4px 12px rgba(25,118,210,0.1)",
+                      objectFit: "contain", // key change
+                      backgroundColor: "#fff", // optional, avoids empty space showing through
+                    }}
+                    imgProps={{
+                      style: { objectFit: "contain" },
+                      onError: (e) => {
+                        e.target.onerror = null;
+                        e.target.src =
+                          "https://randomuser.me/api/portraits/lego/1.jpg";
+                      },
                     }}
                   />
-                  <Typography fontWeight={700} sx={{ textAlign: "center" }}>
-                    {member.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
-                    {member.role}
-                  </Typography>
-                </Box>
+
+                  <CardContent sx={{ p: 0 }}>
+                    <Typography
+                      fontWeight={700}
+                      sx={{ mb: 0.5, color: "#0d47a1" }}
+                    >
+                      {member.name}
+                    </Typography>
+
+                    <Typography
+                      variant="body2"
+                      color="primary"
+                      sx={{ fontWeight: 500, mb: 1 }}
+                    >
+                      {member.role}
+                    </Typography>
+                  </CardContent>
+                </Card>
               </motion.div>
             </Grid>
           ))}
         </Grid>
-      </Box>
+      </motion.div>
+    </Box>
+  );
+}
 
-      {/* Mission & Vision */}
+// --- About Summary Section ---
+function AboutSummary() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.8, delay: 0.2 }}
+    >
       <Box
         sx={{
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
-          gap: 4,
-          mt: 8,
           alignItems: "center",
+          gap: 4,
+          py: 6,
+          px: { xs: 2, md: 6 },
+          bgcolor: "#f9fafb",
+          borderRadius: 4,
+          boxShadow: "0 2px 12px rgba(25, 118, 210, 0.06)",
+          mb: 6,
         }}
       >
-        <Box flex={1}>
-          <motion.div
-            variants={fadeIn}
-            initial="hidden"
-            animate={show ? "visible" : "hidden"}
-          >
-            <Typography
-              variant="h5"
-              fontWeight={700}
-              color="secondary"
-              gutterBottom
-            >
-              Our Mission & Vision
-            </Typography>
-            <Typography variant="body1" sx={{ color: "#555", lineHeight: 1.7 }}>
-              Our mission is to empower creators, learners, and innovators by making project sharing easy, accessible, and inspiring for everyone—no matter your background or goal.
-            </Typography>
-          </motion.div>
-        </Box>
-        <Box flex={1}>
-          <motion.div
-            variants={fadeIn}
-            initial="hidden"
-            animate={show ? "visible" : "hidden"}
-          >
-            <img
-              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=500&auto=format&fit=crop&q=60"
-              alt="Mission"
-              style={{ width: "100%", borderRadius: 12, minHeight: 220, objectFit: "cover" }}
-            />
-          </motion.div>
-        </Box>
-      </Box>
-
-      {/* Why People Trust Us */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column-reverse", md: "row" },
-          gap: 4,
-          mt: 8,
-          alignItems: "center",
-        }}
-      >
-        <Box flex={1}>
-          <motion.div
-            variants={fadeIn}
-            initial="hidden"
-            animate={show ? "visible" : "hidden"}
-          >
-            <img
-              src="https://images.unsplash.com/photo-1579758300918-333e43ba760d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dHJ1c3R8ZW58MHx8MHx8fDA%3D"
-              alt="Trust"
-              style={{ width: "100%", borderRadius: 12, minHeight: 220, objectFit: "cover" }}
-            />
-          </motion.div>
-        </Box>
-        <Box flex={1}>
-          <motion.div
-            variants={fadeIn}
-            initial="hidden"
-            animate={show ? "visible" : "hidden"}
-          >
-            <Typography
-              variant="h5"
-              fontWeight={700}
-              color="secondary"
-              gutterBottom
-            >
-              Why People Trust Us
-            </Typography>
-            <Typography variant="body1" sx={{ color: "#555", lineHeight: 1.7 }}>
-              We prioritize transparency, quality, and innovation. Our community of users knows they can depend on us for reliable, cutting-edge solutions. Every project is reviewed, and our support team is always ready to help.
-            </Typography>
-          </motion.div>
-        </Box>
-      </Box>
-
-      {/* Testimonials */}
-      <Box sx={{ mt: 8 }}>
-        <motion.div
-          variants={fadeIn}
-          initial="hidden"
-          animate={show ? "visible" : "hidden"}
+        {/* Image */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 220,
+            maxWidth: 320,
+            borderRadius: 3,
+            overflow: "hidden",
+            boxShadow: "0 4px 16px rgba(25, 118, 210, 0.10)",
+          }}
         >
-          <Typography
-            variant="h5"
-            fontWeight={700}
-            color="secondary"
-            sx={{ mb: 3, textAlign: "center" }}
+          <img
+            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80"
+            alt="About us"
+            style={{ width: "100%", height: "auto", display: "block" }}
+          />
+        </Box>
+        {/* Vertical line for desktop, horizontal for mobile */}
+        <Divider
+          orientation={{ xs: "horizontal", md: "vertical" }}
+          flexItem
+          sx={{
+            mx: { md: 3 },
+            my: { xs: 3, md: 0 },
+            borderColor: "#1976d2",
+            borderWidth: 2,
+          }}
+        />
+        {/* Summary */}
+        <Box sx={{ flex: 2 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            What Our Users Say
-          </Typography>
-        </motion.div>
-        <Grid container spacing={4} justifyContent="center">
-          {testimonials.map((t) => (
-            <Grid item xs={12} sm={6} md={4} key={t.name}>
-              <motion.div
-                variants={fadeIn}
-                initial="hidden"
-                animate={show ? "visible" : "hidden"}
-                whileHover={{ scale: 1.04 }}
-              >
-                <Box sx={{ textAlign: "center", maxWidth: 320, mx: "auto", p: 2 }}>
-                  <Avatar
-                    src={t.img}
-                    alt={t.name}
-                    sx={{ width: 56, height: 56, mx: "auto", mb: 1 }}
-                  />
-                  <Typography variant="subtitle1" fontWeight={700}>
-                    {t.name}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ fontStyle: "italic" }}
-                  >
-                    "{t.text}"
-                  </Typography>
-                </Box>
-              </motion.div>
-            </Grid>
-          ))}
-        </Grid>
+            <Typography
+              variant="h3"
+              fontWeight={800}
+              color="primary"
+              sx={{
+                mb: 2,
+                fontFamily: "'Inter', sans-serif",
+                letterSpacing: "0.5px",
+                textTransform: "uppercase",
+              }}
+            >
+              Who We Are
+            </Typography>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#424242",
+                fontSize: "1.2rem",
+                lineHeight: 1.9,
+                fontWeight: 400,
+                maxWidth: "700px",
+              }}
+            >
+              We are more than just a team — we are innovators, dreamers, and
+              builders. With every project, we push boundaries to craft
+              solutions that empower students, creators, and professionals to
+              rise higher. Our mission is simple yet powerful: ignite curiosity,
+              fuel collaboration, and transform ideas into impact. Guided by
+              transparency, quality, and a passion for excellence, we are
+              shaping the future — together.
+            </Typography>
+          </motion.div>
+        </Box>
       </Box>
-    </Box>
+    </motion.div>
+  );
+}
+
+export default function AboutUsPage() {
+  return (
+    <Container maxWidth="lg" sx={{ py: 6 }}>
+      <TeamGrid />
+      <AboutSummary />
+    </Container>
   );
 }

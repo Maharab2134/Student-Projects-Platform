@@ -105,6 +105,7 @@ export default function Navbar({
       action: () => handlePageChange("admin_custom_requests"),
     },
     { label: "Logout", icon: <LogoutIcon />, action: handleLogout },
+    { label: "Team", action: () => handlePageChange("admin_team") },
   ];
 
   return (
@@ -356,6 +357,14 @@ export default function Navbar({
                   sx={{ mr: 1 }}
                 >
                   Orders
+                </Button>
+                <Button
+                  color="inherit"
+                  onClick={() => setPage("admin_team")}
+                  size="small"
+                  sx={{ mr: 1 }}
+                >
+                  Team
                 </Button>
                 <Button
                   color="inherit"

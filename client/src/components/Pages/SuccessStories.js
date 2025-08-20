@@ -58,16 +58,80 @@ const stories = [
     field: "Data Science",
   },
   {
-    name: "Sabbir Hossain",
-    university: "IUT (BD)",
-    img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bWVuJTIwcG9ydHJhaXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+    name: "Muhibur Hasan Roman",
+    university: "BUBT",
+    img: "https://res.cloudinary.com/dyl34zggp/image/upload/v1755688897/Muhibur_Hasan_Roman_mw1tny.webp",
     text: "The platform is easy to use and has a wide variety of projects.",
     rating: 4,
-    field: "UI/UX Design",
+    field: "App Development",
+  },
+  {
+    name: "Tanvir Ahmed",
+    university: "DU",
+    img: "https://images.unsplash.com/photo-1614282701125-3f6c28f1849f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    text: "I learned a lot from the ML projects here. Very helpful for my thesis.",
+    rating: 5,
+    field: "ML",
+  },
+  {
+    name: "Nabila Tasnim",
+    university: "NSU",
+    img: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    text: "The App templates are very easy to customize. Loved it!",
+    rating: 4,
+    field: "App Development",
+  },
+  {
+    name: "Rafiq Islam",
+    university: "BUET",
+    img: "https://images.unsplash.com/photo-1531256379411-d48c5cfc5b6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    text: "Web projects here gave me a boost for my portfolio.",
+    rating: 5,
+    field: "Web Development",
+  },
+  {
+    name: "Sharmin Akter",
+    university: "BRAC University",
+    img: "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    text: "The Data Science projects are very practical and well explained.",
+    rating: 5,
+    field: "Data Science",
+  },
+  {
+    name: "Aminul Haque",
+    university: "BUBT",
+    img: "https://images.unsplash.com/photo-1614282834234-d8658fbe52bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    text: "I improved my React skills using frontend projects from this platform.",
+    rating: 4,
+    field: "Frontend Development",
+  },
+  {
+    name: "Farhana Sultana",
+    university: "NSU",
+    img: "https://images.unsplash.com/photo-1621609766131-53b30f4db9ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    text: "App development projects are easy to follow and well structured.",
+    rating: 5,
+    field: "App Development",
+  },
+  {
+    name: "Arif Chowdhury",
+    university: "DU",
+    img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    text: "ML projects helped me understand algorithms practically.",
+    rating: 5,
+    field: "ML",
+  },
+  {
+    name: "Lamia Rahman",
+    university: "BUET",
+    img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    text: "Web project templates saved me a lot of development time.",
+    rating: 4,
+    field: "Web Development",
   },
 ];
 
-const AUTO_SLIDE_MS = 5000; // 5 seconds
+const AUTO_SLIDE_MS = 3000; // 5 seconds
 
 export default function SuccessStories() {
   const theme = useTheme();
@@ -77,7 +141,7 @@ export default function SuccessStories() {
   const [isHovered, setIsHovered] = useState(false);
 
   // Determine cards per view based on screen size
-  let cardsPerView = 3; // default
+  let cardsPerView = 4; // default
   if (isMobile) cardsPerView = 1;
   else if (isTablet) cardsPerView = 2;
 

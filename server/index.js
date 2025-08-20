@@ -77,6 +77,16 @@ const CustomRequest = mongoose.model(
   })
 );
 
+// Team members data
+const TeamMember = mongoose.model(
+  "TeamMember",
+  new mongoose.Schema({
+    name: { type: String, required: true },
+    role: { type: String, required: true },
+    img: { type: String, required: true },
+  })
+);
+
 // Auth middleware
 function auth(req, res, next) {
   const token = req.headers["authorization"];
@@ -254,6 +264,12 @@ app.get("/api/projects", async (req, res) => {
   res.json(projects);
 });
 
+// Get all team members
+app.get("/api/team", async (req, res) => {
+  const team = await TeamMember.find();
+  res.json(team);
+});
+
 // Admin: add project
 app.post("/api/admin/project", auth, admin, async (req, res) => {
   const { title, desc, price, img, category, language, duration, sold } =
@@ -270,6 +286,23 @@ app.post("/api/admin/project", auth, admin, async (req, res) => {
   });
   res.json({ success: true });
 });
+
+// Admin: Add team member 
+app.post("/api/team", auth, admin, async (req, res) => {
+  const { name, role, img } = req.body;
+  if (!name || !role || !img) return res.status(400).send("Missing fields");
+  await TeamMember.create({ name, role, img });
+  res.json({ success: true });
+});
+
+// Admin: Update team member
+app.put("/api/team/:id", auth, admin, async (req, res) => {
+  const { name, role, img } = req.body;
+  if (!name || !role || !img) return res.status(400).send("Missing fields");
+  await TeamMember.findByIdAndUpdate(req.params.id, { name, role, img });
+  res.json({ success: true });
+});
+
 // Admin: update project
 app.put("/api/admin/project/:id", auth, admin, async (req, res) => {
   const { title, desc, price, img, category, language, sold, duration } =
@@ -284,6 +317,12 @@ app.put("/api/admin/project/:id", auth, admin, async (req, res) => {
     sold,
     duration,
   });
+  res.json({ success: true });
+});
+
+// Admin: Delete a team member 
+app.delete("/api/team/:id", auth, admin, async (req, res) => {
+  await TeamMember.findByIdAndDelete(req.params.id);
   res.json({ success: true });
 });
 
