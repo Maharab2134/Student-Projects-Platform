@@ -20,6 +20,7 @@ import {
   DialogActions,
   Chip,
   IconButton,
+  ListSubheader,
 } from "@mui/material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,16 +28,55 @@ import EditIcon from "@mui/icons-material/Edit";
 import Autocomplete from "@mui/material/Autocomplete";
 
 const CATEGORIES = ["Web", "App", "ML"];
-const LANGUAGES = [
-  "JavaScript",
-  "Python",
-  "Java",
-  "C++",
-  "Dart",
-  "Kotlin",
-  "Swift",
-  "Other",
+
+// Categorized languages
+const CATEGORIZED_LANGUAGES = [
+  {
+    category: "App Development",
+    languages: [
+      "Java",
+      "Kotlin",
+      "Swift",
+      "Flutter",
+      "React Native",
+      "PHP (Api)",
+    ],
+  },
+  {
+    category: "Web Development",
+    languages: [
+      "HTML",
+      "React",
+      "Next.js",
+      "Node.js",
+      "PHP",
+      "Express.js",
+      "JavaScript",
+      "TypeScript",
+      "Django (Python)",
+    ],
+  },
+  {
+    category: "Machine Learning",
+    languages: ["TensorFlow", "PyTorch", "Scikit-learn", "Python"],
+  },
+  {
+    category: "Database",
+    languages: ["MySQL", "PostgreSQL", "Firebase", "SQLite", "MongoDB"],
+  },
+  {
+    category: "Design & Styling",
+    languages: [
+      "CSS",
+      "XML",
+      "Sass",
+      "Tailwind CSS",
+      "Bootstrap",
+      "Material UI",
+    ],
+  },
 ];
+
 const DURATION_OPTIONS = [
   "7 days",
   "10 days",
@@ -75,6 +115,20 @@ export default function AdminProductsView({
   const confirmDelete = () => {
     onDelete(deleteConfirm);
     setDeleteConfirm(null);
+  };
+
+  // Render categorized menu items for the language select
+  const renderLanguageMenuItems = () => {
+    return CATEGORIZED_LANGUAGES.map((categoryGroup) => [
+      <ListSubheader key={categoryGroup.category}>
+        {categoryGroup.category}
+      </ListSubheader>,
+      ...categoryGroup.languages.map((lang) => (
+        <MenuItem key={lang} value={lang}>
+          {lang}
+        </MenuItem>
+      )),
+    ]);
   };
 
   return (
@@ -144,11 +198,7 @@ export default function AdminProductsView({
               )}
               required
             >
-              {LANGUAGES.map((lang) => (
-                <MenuItem key={lang} value={lang}>
-                  {lang}
-                </MenuItem>
-              ))}
+              {renderLanguageMenuItems()}
             </Select>
           </FormControl>
 
@@ -178,9 +228,6 @@ export default function AdminProductsView({
             freeSolo
             options={DURATION_OPTIONS}
             value={newProject.duration || ""}
-            onChange={(_, value) =>
-              setNewProject((f) => ({ ...f, duration: value }))
-            }
             onInputChange={(_, value) =>
               setNewProject((f) => ({ ...f, duration: value }))
             }
@@ -197,14 +244,17 @@ export default function AdminProductsView({
           <TextField
             label="Sold"
             type="number"
-            value={newProject.sold || 0}
+            value={newProject.sold === undefined ? "" : newProject.sold}
             onChange={(e) =>
-              setNewProject((f) => ({ ...f, sold: e.target.value }))
+              setNewProject((f) => ({
+                ...f,
+                sold:
+                  e.target.value === "" ? undefined : Number(e.target.value),
+              }))
             }
             sx={{ minWidth: 100, maxWidth: 140 }}
             inputProps={{ min: 0 }}
           />
-
           <TextField
             label="Description"
             value={newProject.desc}
@@ -346,11 +396,7 @@ export default function AdminProductsView({
                   )}
                   required
                 >
-                  {LANGUAGES.map((lang) => (
-                    <MenuItem key={lang} value={lang}>
-                      {lang}
-                    </MenuItem>
-                  ))}
+                  {renderLanguageMenuItems()}
                 </Select>
               </FormControl>
             </Box>

@@ -299,6 +299,8 @@ function App() {
       img: "",
       category: "",
       language: [],
+      duration: "",
+      sold: 0,
     });
     const res = await axios.get(`${API}/projects`);
     setProjects(res.data);

@@ -256,11 +256,20 @@ app.get("/api/projects", async (req, res) => {
 
 // Admin: add project
 app.post("/api/admin/project", auth, admin, async (req, res) => {
-  const { title, desc, price, img, category, language } = req.body;
-  await Project.create({ title, desc, price, img, category, language });
+  const { title, desc, price, img, category, language, duration, sold } =
+    req.body;
+  await Project.create({
+    title,
+    desc,
+    price,
+    img,
+    category,
+    language,
+    sold,
+    duration,
+  });
   res.json({ success: true });
 });
-
 // Admin: update project
 app.put("/api/admin/project/:id", auth, admin, async (req, res) => {
   const { title, desc, price, img, category, language, sold, duration } =

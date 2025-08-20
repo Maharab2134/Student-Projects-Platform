@@ -202,7 +202,7 @@ export default function Footer({ setPage }) {
             </Box>
 
             {/* Contact information */}
-            <Box sx={{ flex: 1, minWidth: 250 }}>
+            <Box sx={{ flex: 1, minWidth: 250, }}>
               <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>
                 Contact Info
               </Typography>
@@ -257,7 +257,7 @@ export default function Footer({ setPage }) {
             </Box>
 
             {/* Useful Links */}
-            <Box sx={{ flex: 1, minWidth: 250 }}>
+            <Box sx={{ flex: -9, minWidth: 250, mt: -6 }}>
               <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>
                 Quick Links
               </Typography>
