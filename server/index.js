@@ -265,7 +265,7 @@ app.get("/api/projects", async (req, res) => {
 });
 
 // Get all team members
-app.get("/team", async (req, res) => {
+app.get("/api/team", async (req, res) => {
   const team = await TeamMember.find();
   res.json(team);
 });

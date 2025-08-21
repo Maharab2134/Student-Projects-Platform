@@ -68,6 +68,7 @@ export default function AdminCustomRequests({ user }) {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
   const theme = useTheme();
+  const API = process.env.REACT_APP_API; // Ensure this is set in your .env file
 
   useEffect(() => {
     if (user?.isAdmin) {
