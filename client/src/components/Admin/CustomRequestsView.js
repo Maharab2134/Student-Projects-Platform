@@ -75,9 +75,12 @@ export default function AdminCustomRequests({ user }) {
       const fetchRequests = () => {
         setLoading(true);
         axios
-          .get(`${API}/admin/requests`, {
-            headers: { Authorization: user.token },
-          })
+          .get(
+            "https://student-projects-platform.onrender.com/api/admin/requests",
+            {
+              headers: { Authorization: user.token },
+            }
+          )
           .then((res) => {
             setRequests(res.data);
             setLoading(false);
