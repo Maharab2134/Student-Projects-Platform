@@ -90,7 +90,7 @@ export default function AdminCustomRequests({ user }) {
   const handleStatusChange = async (id, newStatus) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/admin/request/${id}/status`,
+        `${API}/admin/request/${id}/status`,
         { status: newStatus },
         { headers: { Authorization: user.token } }
       );
@@ -107,7 +107,7 @@ export default function AdminCustomRequests({ user }) {
   const handleDeleteRequest = async (id) => {
     setDeletingId(id);
     try {
-      await axios.delete(`http://localhost:5000/api/admin/request/${id}`, {
+      await axios.delete(`${API}admin/request/${id}`, {
         headers: { Authorization: user.token },
       });
       setRequests((prev) => prev.filter((req) => req._id !== id));
