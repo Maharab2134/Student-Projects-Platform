@@ -16,7 +16,7 @@ export default function ProfilePage({
  const handleSave = async () => {
   try {
     await axios.put(
-      "http://localhost:5000/api/profile",
+      `${API}/profile`,
       profileForm,
       { headers: { Authorization: user.token } }
     );

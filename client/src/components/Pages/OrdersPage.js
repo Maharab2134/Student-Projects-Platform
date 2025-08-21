@@ -72,7 +72,7 @@ export default function OrdersPage({ myOrders, user }) {
     setRatings((prev) => ({ ...prev, [orderId]: newValue }));
     try {
       await axios.post(
-        `http://localhost:5000/api/order/${orderId}/rate`,
+        `${API}/order/${orderId}/rate`,
         { rating: newValue },
         { headers: { Authorization: user.token } }
       );

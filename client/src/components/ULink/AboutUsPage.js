@@ -50,7 +50,7 @@ function TeamGrid() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/team")
+      .get(`${API}/team`)
       .then((res) => {
         setTeam(res.data);
         setLoading(false);

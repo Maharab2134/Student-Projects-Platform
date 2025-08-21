@@ -82,7 +82,7 @@ export default function MyCustomRequests({ user }) {
   useEffect(() => {
     if (user) {
       axios
-        .get("http://localhost:5000/api/myrequests", {
+        .get(`${API}/myrequests`, {
           headers: { Authorization: user.token },
         })
         .then((res) => {
