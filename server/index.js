@@ -484,4 +484,8 @@ app.put("/api/admin/order/:id/pay", auth, admin, async (req, res) => {
   res.json({ success: true });
 });
 
+app.get("/api", (req, res) => {
+  res.send("API is working!");
+});
+
 app.listen(5000, () => console.log("Server running on port 5000"));
