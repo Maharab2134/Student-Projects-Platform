@@ -14,7 +14,6 @@ import {
   useTheme,
   Drawer,
   List,
-  ListItem,
   ListItemIcon,
   ListItemText,
   Divider,

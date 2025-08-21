@@ -18,7 +18,6 @@ import {
   Fade,
   Zoom,
   useTheme,
-  useMediaQuery,
 } from "@mui/material";
 import {
   Close,
@@ -59,7 +58,6 @@ export default function CustomProjectToggleForm({ user }) {
   const [activeStep, setActiveStep] = useState(0);
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   useEffect(() => {
     if (showForm) {
