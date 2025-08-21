@@ -24,6 +24,7 @@ import DoneAllIcon from "@mui/icons-material/DoneAll";
 import PsychologyIcon from "@mui/icons-material/Psychology";
 import { keyframes } from "@emotion/react";
 const API = process.env.REACT_APP_API; // Ensure this is set in your .env file
+
 // Animation for cards
 const floatAnimation = keyframes`
   0% { transform: translateY(0px); }
