@@ -37,7 +37,8 @@ import RefundPolicyPage from "./components/ULink/RefundPolicyPage";
 import TermsPage from "./components/ULink/TermsPage";
 import PrivacyPolicyPage from "./components/ULink/PrivacyPolicyPage";
 
-const API = "https://student-projects-platform.onrender.com/api";
+const API = process.env.REACT_APP_API; // Ensure this is set in your .env file
+
 const CATEGORIES = ["Web", "App", "ML"];
 
 function App() {
@@ -162,7 +163,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/project-ratings")
+      .get(`${API}/project-ratings`)
       .then((res) => setProjectRatings(res.data));
   }, [projects]);
 

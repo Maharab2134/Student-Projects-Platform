@@ -25,8 +25,7 @@ import { Add, Edit, Delete } from "@mui/icons-material";
 import Autocomplete from "@mui/material/Autocomplete";
 import axios from "axios";
 
-const API = "http://localhost:5000/api";
-
+const API = process.env.REACT_APP_API;
 // Suggested roles
 const roleOptions = [
   "Founder & CEO",
@@ -225,12 +224,7 @@ export default function AdminTeamPage({ user }) {
               onChange={handleRoleChange}
               onInputChange={handleRoleChange}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Role"
-                  name="role"
-                  required
-                />
+                <TextField {...params} label="Role" name="role" required />
               )}
             />
             <TextField

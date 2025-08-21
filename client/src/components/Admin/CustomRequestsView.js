@@ -74,7 +74,7 @@ export default function AdminCustomRequests({ user }) {
       const fetchRequests = () => {
         setLoading(true);
         axios
-          .get("http://localhost:5000/api/admin/requests", {
+          .get(`${API}/admin/requests`, {
             headers: { Authorization: user.token },
           })
           .then((res) => {
