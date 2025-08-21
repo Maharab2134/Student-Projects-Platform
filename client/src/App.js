@@ -533,7 +533,9 @@ function App() {
           {user && !user.isAdmin && page === "my_custom_requests" && (
             <ViewCustomRequest user={user} />
           )}
-          {user && user.isAdmin && page === "admin_team" && <AdminTeamPage user={user} />}
+          {user && user.isAdmin && page === "admin_team" && (
+            <AdminTeamPage user={user} />
+          )}
           {/* ULink Pages */}
 
           {page === "about" && <AboutUsPage user={user} />}
