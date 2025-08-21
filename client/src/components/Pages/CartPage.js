@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -7,14 +6,11 @@ import {
   IconButton,
   Divider,
   Button,
-  Switch,
   useTheme,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
   ShoppingCartCheckout as ShoppingCartCheckoutIcon,
-  LightMode as LightModeIcon,
-  DarkMode as DarkModeIcon,
 } from "@mui/icons-material";
 import { motion, AnimatePresence } from "framer-motion";
 import { styled } from "@mui/system";
@@ -36,13 +32,8 @@ const StyledCartItem = styled(motion.div)(({ theme }) => ({
 
 export default function CartPage({ cart, removeFromCart, handleBuy, setPage }) {
   const theme = useTheme();
-  const [darkMode, setDarkMode] = useState(false);
 
   const total = cart.reduce((sum, p) => sum + p.price, 0);
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
 
   return (
     <Box
@@ -87,16 +78,6 @@ export default function CartPage({ cart, removeFromCart, handleBuy, setPage }) {
         >
           My Shopping Cart
         </Typography>
-
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {theme.palette.mode === "dark" ? <DarkModeIcon /> : <LightModeIcon />}
-          <Switch
-            checked={theme.palette.mode === "dark"}
-            onChange={toggleDarkMode}
-            color="primary"
-            sx={{ ml: 1 }}
-          />
-        </Box>
       </Box>
 
       {cart.length === 0 ? (

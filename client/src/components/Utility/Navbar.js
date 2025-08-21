@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -18,6 +18,8 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  ListItemButton,
+  Collapse,
 } from "@mui/material";
 import SchoolIcon from "@mui/icons-material/School";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -29,10 +31,12 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import Switch from "@mui/material/Switch";
-import AssignmentIcon from "@mui/icons-material/Assignment";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import MenuIcon from "@mui/icons-material/Menu";
-import ListItemButton from "@mui/material/ListItemButton";
+import ShoppingBagOutlined from "@mui/icons-material/ShoppingBagOutlined";
+import DesignServicesOutlined from "@mui/icons-material/DesignServicesOutlined";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 
 export default function Navbar({
   user,
@@ -45,8 +49,10 @@ export default function Navbar({
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [ordersAnchorEl, setOrdersAnchorEl] = React.useState(null);
-  const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState(null);
+  const [ordersAnchorEl, setOrdersAnchorEl] = useState(null);
+  const [mobileMenuAnchor, setMobileMenuAnchor] = useState(null);
+  const [openOrdersMobile, setOpenOrdersMobile] = useState(false);
+
   const openOrdersMenu = Boolean(ordersAnchorEl);
   const openMobileMenu = Boolean(mobileMenuAnchor);
 
@@ -56,11 +62,17 @@ export default function Navbar({
 
   const handleMobileMenuClose = () => {
     setMobileMenuAnchor(null);
+    setOrdersAnchorEl(null);
+    setOpenOrdersMobile(false);
   };
 
   const handlePageChange = (page) => {
     setPage(page);
     handleMobileMenuClose();
+  };
+
+  const handleOrdersClickMobile = () => {
+    setOpenOrdersMobile(!openOrdersMobile);
   };
 
   // Regular user menu items
@@ -97,15 +109,36 @@ export default function Navbar({
 
   // Admin menu items
   const adminMenuItems = [
-    { label: "Products", action: () => handlePageChange("admin_products") },
-    { label: "Orders", action: () => handlePageChange("admin_orders") },
-    { label: "Users", action: () => handlePageChange("admin_users") },
+    {
+      label: "Products",
+      action: () => handlePageChange("admin_products"),
+      icon: <PersonIcon />,
+    },
+    {
+      label: "Orders",
+      action: () => handlePageChange("admin_orders"),
+      icon: <ListAltIcon />,
+    },
+    {
+      label: "Users",
+      action: () => handlePageChange("admin_users"),
+      icon: <PersonIcon />,
+    },
     {
       label: "Custom Requests",
       action: () => handlePageChange("admin_custom_requests"),
+      icon: <DesignServicesOutlined />,
     },
-    { label: "Logout", icon: <LogoutIcon />, action: handleLogout },
-    { label: "Team", action: () => handlePageChange("admin_team") },
+    {
+      label: "Team",
+      action: () => handlePageChange("admin_team"),
+      icon: <PersonIcon />,
+    },
+    {
+      label: "Logout",
+      icon: <LogoutIcon />,
+      action: handleLogout,
+    },
   ];
 
   return (
@@ -172,8 +205,7 @@ export default function Navbar({
 
                 {!user ? (
                   <List>
-                    <ListItem
-                      button
+                    <ListItemButton
                       onClick={() => {
                         setLoginOpen(true);
                         handleMobileMenuClose();
@@ -183,14 +215,15 @@ export default function Navbar({
                         <LoginIcon />
                       </ListItemIcon>
                       <ListItemText primary="Login" />
-                    </ListItem>
+                    </ListItemButton>
                   </List>
                 ) : user.isAdmin ? (
                   <List>
                     {adminMenuItems.map((item, index) => (
-                      <ListItem key={index} button onClick={item.action}>
+                      <ListItemButton key={index} onClick={item.action}>
+                        <ListItemIcon>{item.icon}</ListItemIcon>
                         <ListItemText primary={item.label} />
-                      </ListItem>
+                      </ListItemButton>
                     ))}
                   </List>
                 ) : (
@@ -199,45 +232,53 @@ export default function Navbar({
                       <div key={index}>
                         {item.subItems ? (
                           <>
-                            <ListItem
-                              button
-                              onClick={() =>
-                                setOrdersAnchorEl(
-                                  document.getElementById(
-                                    `orders-menu-${index}`
-                                  )
-                                )
-                              }
-                            >
+                            <ListItemButton onClick={handleOrdersClickMobile}>
                               <ListItemIcon>{item.icon}</ListItemIcon>
                               <ListItemText primary={item.label} />
-                              <ArrowDropDownIcon />
-                            </ListItem>
-                            <Menu
-                              id={`orders-menu-${index}`}
-                              anchorEl={ordersAnchorEl}
-                              open={Boolean(ordersAnchorEl)}
-                              onClose={() => setOrdersAnchorEl(null)}
+                              {openOrdersMobile ? (
+                                <ExpandLess />
+                              ) : (
+                                <ExpandMore />
+                              )}
+                            </ListItemButton>
+                            <Collapse
+                              in={openOrdersMobile}
+                              timeout="auto"
+                              unmountOnExit
                             >
-                              {item.subItems.map((subItem, subIndex) => (
-                                <MenuItem
-                                  key={subIndex}
-                                  onClick={() => {
-                                    subItem.action();
-                                    setOrdersAnchorEl(null);
-                                  }}
-                                >
-                                  {subItem.label}
-                                </MenuItem>
-                              ))}
-                            </Menu>
+                              <List component="div" disablePadding>
+                                {item.subItems.map((subItem, subIndex) => (
+                                  <ListItemButton
+                                    key={subIndex}
+                                    onClick={subItem.action}
+                                    sx={{ pl: 4 }}
+                                  >
+                                    <ListItemIcon>
+                                      {subItem.label === "All Orders" ? (
+                                        <ShoppingBagOutlined />
+                                      ) : (
+                                        <DesignServicesOutlined />
+                                      )}
+                                    </ListItemIcon>
+                                    <ListItemText primary={subItem.label} />
+                                  </ListItemButton>
+                                ))}
+                              </List>
+                            </Collapse>
                           </>
                         ) : (
-                          <ListItem disablePadding>
-                            <ListItemButton onClick={item.action}>
-                              <ListItemText primary={item.label} />
-                            </ListItemButton>
-                          </ListItem>
+                          <ListItemButton onClick={item.action}>
+                            <ListItemIcon>
+                              {item.badge > 0 ? (
+                                <Badge badgeContent={item.badge} color="error">
+                                  {item.icon}
+                                </Badge>
+                              ) : (
+                                item.icon
+                              )}
+                            </ListItemIcon>
+                            <ListItemText primary={item.label} />
+                          </ListItemButton>
                         )}
                       </div>
                     ))}
@@ -291,16 +332,19 @@ export default function Navbar({
                       setPage("orders");
                       setOrdersAnchorEl(null);
                     }}
+                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
                   >
-                    All Orders
+                    <ShoppingBagOutlined fontSize="small" />
+                    Orders
                   </MenuItem>
                   <MenuItem
                     onClick={() => {
                       setPage("my_custom_requests");
                       setOrdersAnchorEl(null);
                     }}
+                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
                   >
-                    <AssignmentIcon sx={{ mr: 1, fontSize: 20 }} />
+                    <DesignServicesOutlined fontSize="small" />
                     Custom Orders
                   </MenuItem>
                 </Menu>

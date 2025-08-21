@@ -19,10 +19,10 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import WorkIcon from "@mui/icons-material/Work";
 import PaymentIcon from "@mui/icons-material/Payment";
-import Tilt from "react-parallax-tilt";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import Rating from "@mui/material/Rating";
+import Tilt from "react-parallax-tilt";
 import axios from "axios";
 
 const steps = [
@@ -76,13 +76,14 @@ export default function OrdersPage({ myOrders, user }) {
         { rating: newValue },
         { headers: { Authorization: user.token } }
       );
-    } catch (err) {
+    } catch {
       alert("Failed to save rating");
     }
   };
 
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto", mt: 4 }}>
+      {/* Page title */}
       <Typography
         variant="h4"
         fontWeight={800}
@@ -92,6 +93,7 @@ export default function OrdersPage({ myOrders, user }) {
         My Orders
       </Typography>
 
+      {/* Status Flow Section */}
       <Box
         sx={{
           mb: 4,
@@ -148,14 +150,17 @@ export default function OrdersPage({ myOrders, user }) {
         </Collapse>
       </Box>
 
+      {/* Empty State */}
       {myOrders.length === 0 && (
         <Typography align="center" color="text.secondary" sx={{ mt: 6 }}>
           You have no orders yet.
         </Typography>
       )}
+
+      {/* Orders Grid */}
       <Grid container spacing={7} sx={{ mt: 3 }}>
         {myOrders.map((o) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={o._id}>
+          <Grid item xs={12} sm={6} md={4} key={o._id}>
             <Tilt
               glareEnable={true}
               glareMaxOpacity={0.15}
@@ -170,7 +175,7 @@ export default function OrdersPage({ myOrders, user }) {
                   border: "1px solid #e3e3e3",
                   borderRadius: 3,
                   boxShadow: 2,
-                  p: 8,
+                  p: 6,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -197,6 +202,8 @@ export default function OrdersPage({ myOrders, user }) {
                     />
                   </Tooltip>
                 )}
+
+                {/* Order Details */}
                 <Typography fontWeight={700} sx={{ mb: 0.2, fontSize: 16 }}>
                   Order #{o._id.slice(-6).toUpperCase()}
                 </Typography>
@@ -207,6 +214,8 @@ export default function OrdersPage({ myOrders, user }) {
                 >
                   {new Date(o.createdAt).toLocaleString()}
                 </Typography>
+
+                {/* Status chip */}
                 <Chip
                   label={o.status}
                   color={
@@ -218,13 +227,14 @@ export default function OrdersPage({ myOrders, user }) {
                       ? "error"
                       : o.status === "Working"
                       ? "primary"
-                      : o.status === "Delivery" || o.status === "Complete"
+                      : ["Delivery", "Complete"].includes(o.status)
                       ? "success"
                       : "default"
                   }
                   size="small"
                   sx={{ fontWeight: 700, mb: 0.2 }}
                 />
+
                 <Typography
                   fontSize={13}
                   color="text.secondary"
@@ -239,7 +249,8 @@ export default function OrdersPage({ myOrders, user }) {
                 >
                   Total: BDT {o.total}k
                 </Typography>
-                {/* User Rating */}
+
+                {/* User Rating (only on Delivery or Complete) */}
                 {["Delivery", "Complete"].includes(o.status) && (
                   <>
                     <Rating

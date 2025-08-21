@@ -15,7 +15,8 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error(err));
 
-// Models
+// Models all the data models
+
 const User = mongoose.model(
   "User",
   new mongoose.Schema({
@@ -59,7 +60,6 @@ const Order = mongoose.model(
   })
 );
 
-// Custom project request model
 const CustomRequest = mongoose.model(
   "CustomRequest",
   new mongoose.Schema({
@@ -77,7 +77,6 @@ const CustomRequest = mongoose.model(
   })
 );
 
-// Team members data
 const TeamMember = mongoose.model(
   "TeamMember",
   new mongoose.Schema({
@@ -87,7 +86,7 @@ const TeamMember = mongoose.model(
   })
 );
 
-// Auth middleware
+// Auth middleware for protected routes
 function auth(req, res, next) {
   const token = req.headers["authorization"];
   if (!token) return res.sendStatus(401);
@@ -134,6 +133,7 @@ app.post("/api/login", async (req, res) => {
     );
     return res.json({ token, isAdmin: true, name: user.name });
   }
+
   // Student login
   const user = await User.findOne({ email });
   if (!user) return res.status(401).send("Invalid");
@@ -188,7 +188,7 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-// Update user profile (for logged-in user)
+// Update user profile (for students)
 app.put("/api/profile", auth, async (req, res) => {
   const { name, email, phone, institute, address, idNumber } = req.body;
   try {
@@ -287,7 +287,7 @@ app.post("/api/admin/project", auth, admin, async (req, res) => {
   res.json({ success: true });
 });
 
-// Admin: Add team member 
+// Admin: Add team member
 app.post("/api/team", auth, admin, async (req, res) => {
   const { name, role, img } = req.body;
   if (!name || !role || !img) return res.status(400).send("Missing fields");
@@ -320,7 +320,7 @@ app.put("/api/admin/project/:id", auth, admin, async (req, res) => {
   res.json({ success: true });
 });
 
-// Admin: Delete a team member 
+// Admin: Delete a team member
 app.delete("/api/team/:id", auth, admin, async (req, res) => {
   await TeamMember.findByIdAndDelete(req.params.id);
   res.json({ success: true });
@@ -332,7 +332,7 @@ app.delete("/api/admin/project/:id", auth, admin, async (req, res) => {
   res.json({ success: true });
 });
 
-// Place order (buy projects)
+// Students: Place order (buy projects)
 app.post("/api/order", auth, async (req, res) => {
   const { projects, total, paymentMethod, transactionId } = req.body;
   if (!projects || !total || !paymentMethod || !transactionId)
