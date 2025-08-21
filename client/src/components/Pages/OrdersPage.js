@@ -67,7 +67,7 @@ const steps = [
 export default function OrdersPage({ myOrders, user }) {
   const [openStatusTree, setOpenStatusTree] = React.useState(false);
   const [ratings, setRatings] = React.useState({});
-
+  const API = process.env.REACT_APP_API;
   const handleRate = async (orderId, newValue) => {
     setRatings((prev) => ({ ...prev, [orderId]: newValue }));
     try {

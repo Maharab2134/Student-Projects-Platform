@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 import axios from "axios";
-
+const API = process.env.REACT_APP_API;
 // Animation variants
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
