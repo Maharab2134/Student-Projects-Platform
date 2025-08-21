@@ -37,7 +37,7 @@ import RefundPolicyPage from "./components/ULink/RefundPolicyPage";
 import TermsPage from "./components/ULink/TermsPage";
 import PrivacyPolicyPage from "./components/ULink/PrivacyPolicyPage";
 
-const API = "https://student-projects-platform.onrender.com/api";
+const API = "http://localhost:5000/api";
 const CATEGORIES = ["Web", "App", "ML"];
 
 function App() {
