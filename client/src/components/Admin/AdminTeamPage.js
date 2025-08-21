@@ -26,6 +26,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import axios from "axios";
 
 const API = process.env.REACT_APP_API;
+
 // Suggested roles
 const roleOptions = [
   "Founder & CEO",
@@ -55,6 +56,7 @@ export default function AdminTeamPage({ user }) {
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState({ name: "", role: "", img: "" });
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     msg: "",
