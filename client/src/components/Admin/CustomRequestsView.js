@@ -86,7 +86,7 @@ export default function AdminCustomRequests({ user }) {
       };
       fetchRequests();
     }
-  }, [user]);
+  }, [user, API]);
 
   const handleStatusChange = async (id, newStatus) => {
     try {
