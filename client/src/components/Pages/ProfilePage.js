@@ -3,6 +3,8 @@ import { Box, Typography, Avatar, Button, TextField } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import axios from "axios";
 
+const API = process.env.REACT_APP_API; // Ensure this is set in your .env file
+
 export default function ProfilePage({
   user,
   editProfile,
@@ -12,7 +14,6 @@ export default function ProfilePage({
   setSnackbar,
   setUser,
 }) {
-  const API = process.env.REACT_APP_API; // Ensure this is set in your .env file
   const handleSave = async () => {
     try {
       await axios.put(`${API}/profile`, profileForm, {

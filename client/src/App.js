@@ -38,6 +38,7 @@ import TermsPage from "./components/ULink/TermsPage";
 import PrivacyPolicyPage from "./components/ULink/PrivacyPolicyPage";
 
 const API = process.env.REACT_APP_API; // Ensure this is set in your .env file
+console.log("API:", API); // <-- এখানে দিন
 
 const CATEGORIES = ["Web", "App", "ML"];
 
