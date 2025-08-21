@@ -4,7 +4,7 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
-const path = require('path');
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -482,15 +482,6 @@ app.delete("/api/admin/order/:id", auth, admin, async (req, res) => {
 app.put("/api/admin/order/:id/pay", auth, admin, async (req, res) => {
   await Order.findByIdAndUpdate(req.params.id, { status: "Completed" });
   res.json({ success: true });
-});
-
-// ... all your API routes above ...
-
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, "../client/build")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/build", "index.html"));
 });
 
 app.listen(5000, () => console.log("Server running on port 5000"));
