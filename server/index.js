@@ -1,23 +1,22 @@
-// server/index.js
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const path = require("path"); // for serving React build
 require("dotenv").config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- MongoDB connection ---
+// MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error(err));
 
-// --- Models ---
+// Models all the data models
+
 const User = mongoose.model(
   "User",
   new mongoose.Schema({
@@ -43,7 +42,7 @@ const Project = mongoose.model(
     language: [String],
     sold: { type: String, default: "0" },
     duration: String,
-    rating: { type: Number, default: 0 },
+    rating: { type: Number, default: 0 }, // average rating
   })
 );
 
@@ -87,7 +86,7 @@ const TeamMember = mongoose.model(
   })
 );
 
-// --- Middleware ---
+// Auth middleware for protected routes
 function auth(req, res, next) {
   const token = req.headers["authorization"];
   if (!token) return res.sendStatus(401);
@@ -99,12 +98,13 @@ function auth(req, res, next) {
   }
 }
 
+// Admin middleware
 function admin(req, res, next) {
   if (!req.user.isAdmin) return res.sendStatus(403);
   next();
 }
 
-// --- Static admin creation ---
+// Static admin creation (run once)
 async function createStaticAdmin() {
   const exists = await User.findOne({ email: "admin@gmail.com" });
   if (!exists) {
@@ -120,7 +120,7 @@ async function createStaticAdmin() {
 }
 createStaticAdmin();
 
-// --- Auth routes ---
+// Unified login (admin or student)
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   if (email === "admin@gmail.com" && password === "admin123") {
@@ -156,6 +156,7 @@ app.post("/api/login", async (req, res) => {
   res.json({ token, isAdmin: user.isAdmin, name: user.name });
 });
 
+// Student registration
 app.post("/api/register", async (req, res) => {
   const { name, email, phone, institute, address, idNumber, password } =
     req.body;
@@ -172,7 +173,7 @@ app.post("/api/register", async (req, res) => {
 
   const hashed = await bcrypt.hash(password, 10);
   try {
-    await User.create({
+    const user = await User.create({
       name,
       email,
       phone,
@@ -187,6 +188,7 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
+// Update user profile (for students)
 app.put("/api/profile", auth, async (req, res) => {
   const { name, email, phone, institute, address, idNumber } = req.body;
   try {
@@ -201,17 +203,19 @@ app.put("/api/profile", auth, async (req, res) => {
   }
 });
 
-// --- Project rating routes ---
+// User give rating in project.
 app.post("/api/order/:id/rate", auth, async (req, res) => {
   const { rating } = req.body;
   if (!rating) return res.status(400).json({ error: "Rating required" });
   await Order.findByIdAndUpdate(req.params.id, { rating });
 
+  // Update average rating for each project in this order
   const order = await Order.findById(req.params.id);
   if (order) {
     for (const p of order.projects) {
       const project = await Project.findById(p._id);
       if (project) {
+        // Find all ratings for this project from orders
         const ordersWithThisProject = await Order.find({
           "projects._id": project._id,
           rating: { $gt: 0 },
@@ -230,6 +234,7 @@ app.post("/api/order/:id/rate", auth, async (req, res) => {
   res.json({ success: true });
 });
 
+// Get average rating for all projects
 app.get("/api/project-ratings", async (req, res) => {
   const projects = await Project.find();
   const orders = await Order.find({ rating: { $gt: 0 } });
@@ -253,18 +258,19 @@ app.get("/api/project-ratings", async (req, res) => {
   res.json(projectRatings);
 });
 
-// --- Projects & team ---
+// Get all projects
 app.get("/api/projects", async (req, res) => {
   const projects = await Project.find();
   res.json(projects);
 });
 
+// Get all team members
 app.get("/api/team", async (req, res) => {
   const team = await TeamMember.find();
   res.json(team);
 });
 
-// --- Admin project & team management ---
+// Admin: add project
 app.post("/api/admin/project", auth, admin, async (req, res) => {
   const { title, desc, price, img, category, language, duration, sold } =
     req.body;
@@ -281,6 +287,23 @@ app.post("/api/admin/project", auth, admin, async (req, res) => {
   res.json({ success: true });
 });
 
+// Admin: Add team member
+app.post("/api/team", auth, admin, async (req, res) => {
+  const { name, role, img } = req.body;
+  if (!name || !role || !img) return res.status(400).send("Missing fields");
+  await TeamMember.create({ name, role, img });
+  res.json({ success: true });
+});
+
+// Admin: Update team member
+app.put("/api/team/:id", auth, admin, async (req, res) => {
+  const { name, role, img } = req.body;
+  if (!name || !role || !img) return res.status(400).send("Missing fields");
+  await TeamMember.findByIdAndUpdate(req.params.id, { name, role, img });
+  res.json({ success: true });
+});
+
+// Admin: update project
 app.put("/api/admin/project/:id", auth, admin, async (req, res) => {
   const { title, desc, price, img, category, language, sold, duration } =
     req.body;
@@ -297,38 +320,26 @@ app.put("/api/admin/project/:id", auth, admin, async (req, res) => {
   res.json({ success: true });
 });
 
-app.delete("/api/admin/project/:id", auth, admin, async (req, res) => {
-  await Project.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
-});
-
-app.post("/api/team", auth, admin, async (req, res) => {
-  const { name, role, img } = req.body;
-  if (!name || !role || !img) return res.status(400).send("Missing fields");
-  await TeamMember.create({ name, role, img });
-  res.json({ success: true });
-});
-
-app.put("/api/team/:id", auth, admin, async (req, res) => {
-  const { name, role, img } = req.body;
-  if (!name || !role || !img) return res.status(400).send("Missing fields");
-  await TeamMember.findByIdAndUpdate(req.params.id, { name, role, img });
-  res.json({ success: true });
-});
-
+// Admin: Delete a team member
 app.delete("/api/team/:id", auth, admin, async (req, res) => {
   await TeamMember.findByIdAndDelete(req.params.id);
   res.json({ success: true });
 });
 
-// --- Orders & custom requests ---
+// Admin: delete project
+app.delete("/api/admin/project/:id", auth, admin, async (req, res) => {
+  await Project.findByIdAndDelete(req.params.id);
+  res.json({ success: true });
+});
+
+// Students: Place order (buy projects)
 app.post("/api/order", auth, async (req, res) => {
   const { projects, total, paymentMethod, transactionId } = req.body;
   if (!projects || !total || !paymentMethod || !transactionId)
     return res.status(400).send("Missing fields");
 
   for (const p of projects) {
-    let project = await Project.findById(p._id);
+    let project = await Project.findOne({ _id: p._id });
     if (!project) {
       project = await Project.create({
         _id: p._id,
@@ -338,7 +349,7 @@ app.post("/api/order", auth, async (req, res) => {
         img: p.img,
         category: p.category,
         language: p.language,
-        sold: "1",
+        sold: "1", // as string
         duration: p.duration,
         rating: 0,
       });
@@ -359,6 +370,7 @@ app.post("/api/order", auth, async (req, res) => {
   res.json({ success: true });
 });
 
+// Student: view my orders
 app.get("/api/myorders", auth, async (req, res) => {
   const orders = await Order.find({ userId: req.user.id }).sort({
     createdAt: -1,
@@ -366,6 +378,7 @@ app.get("/api/myorders", auth, async (req, res) => {
   res.json(orders);
 });
 
+// Student: view my custom project requests
 app.get("/api/myrequests", auth, async (req, res) => {
   const requests = await CustomRequest.find({ userId: req.user.id }).sort({
     createdAt: -1,
@@ -373,42 +386,43 @@ app.get("/api/myrequests", auth, async (req, res) => {
   res.json(requests);
 });
 
+// Student: submit custom project request
 app.post("/api/request", auth, async (req, res) => {
-  const {
-    name,
-    email,
-    phone,
-    university,
-    type,
-    subject,
-    deadline,
-    description,
-  } = req.body;
-  await CustomRequest.create({
-    userId: req.user.id,
-    name,
-    email,
-    phone,
-    university,
-    type,
-    subject,
-    deadline,
-    description,
-  });
-  res.json({ success: true, message: "Request submitted successfully!" });
+  try {
+    const {
+      name,
+      email,
+      phone,
+      university,
+      type,
+      subject,
+      deadline,
+      description,
+    } = req.body;
+    await CustomRequest.create({
+      userId: req.user.id,
+      name,
+      email,
+      phone,
+      university,
+      type,
+      subject,
+      deadline,
+      description,
+    });
+    res.json({ success: true, message: "Request submitted successfully!" });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to submit request." });
+  }
 });
 
-// --- Admin orders & requests ---
-app.get("/api/admin/orders", auth, admin, async (req, res) => {
-  const orders = await Order.find().sort({ createdAt: -1 });
-  res.json(orders);
-});
-
+// Admin: view all custom requests
 app.get("/api/admin/requests", auth, admin, async (req, res) => {
   const requests = await CustomRequest.find().sort({ createdAt: -1 });
   res.json(requests);
 });
 
+// Admin: update Order request status
 const allowedStatuses = [
   "Pending",
   "Accepted",
@@ -417,53 +431,57 @@ const allowedStatuses = [
   "Complete",
   "Rejected",
 ];
-
 app.put("/api/admin/order/:id/status", auth, admin, async (req, res) => {
   const { status } = req.body;
-  if (!allowedStatuses.includes(status))
+  if (!allowedStatuses.includes(status)) {
     return res.status(400).json({ error: "Invalid status value" });
+  }
   await Order.findByIdAndUpdate(req.params.id, { status });
   res.json({ success: true });
 });
 
+// Admin: update custom request status
 app.put("/api/admin/request/:id/status", auth, admin, async (req, res) => {
   const { status } = req.body;
   await CustomRequest.findByIdAndUpdate(req.params.id, { status });
   res.json({ success: true });
 });
-
+// Admin: delete custom request
 app.delete("/api/admin/request/:id", auth, admin, async (req, res) => {
+  console.log("Delete request called for", req.params.id);
   await CustomRequest.findByIdAndDelete(req.params.id);
   res.json({ success: true });
 });
 
-app.delete("/api/admin/order/:id", auth, admin, async (req, res) => {
-  await Order.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
+// Admin: view all orders
+app.get("/api/admin/orders", auth, admin, async (req, res) => {
+  const orders = await Order.find().sort({ createdAt: -1 });
+  res.json(orders);
 });
 
-app.put("/api/admin/order/:id/pay", auth, admin, async (req, res) => {
-  await Order.findByIdAndUpdate(req.params.id, { status: "Completed" });
-  res.json({ success: true });
-});
-
+// Admin: view all users
 app.get("/api/admin/users", auth, admin, async (req, res) => {
   const users = await User.find({ isAdmin: false });
   res.json(users);
 });
 
+// Admin: view user details
 app.get("/api/admin/user/:id", auth, admin, async (req, res) => {
   const user = await User.findById(req.params.id);
   const orders = await Order.find({ userId: req.params.id });
   res.json({ user, orders });
 });
 
-// --- Serve React frontend ---
-const clientBuildPath = path.join(__dirname, "../client/build");
-app.use(express.static(clientBuildPath));
+// Admin: delete Order
+app.delete("/api/admin/order/:id", auth, admin, async (req, res) => {
+  await Order.findByIdAndDelete(req.params.id);
+  res.json({ success: true });
+});
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(clientBuildPath, "index.html"));
+// Admin: mark order as paid (optional, for payment handle)
+app.put("/api/admin/order/:id/pay", auth, admin, async (req, res) => {
+  await Order.findByIdAndUpdate(req.params.id, { status: "Completed" });
+  res.json({ success: true });
 });
 
 app.listen(5000, () => console.log("Server running on port 5000"));
