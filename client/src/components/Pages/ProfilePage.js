@@ -12,21 +12,19 @@ export default function ProfilePage({
   setSnackbar,
   setUser,
 }) {
-  
- const handleSave = async () => {
-  try {
-    await axios.put(
-      `${API}/profile`,
-      profileForm,
-      { headers: { Authorization: user.token } }
-    );
-    setEditProfile(false);
-    setSnackbar({ open: true, success: true, msg: "Profile updated!" });
-    if (setUser) setUser(prev => ({ ...prev, ...profileForm }));
-  } catch {
-    setSnackbar({ open: true, success: false, msg: "Profile update failed" });
-  }
-};
+  const API = process.env.REACT_APP_API; // Ensure this is set in your .env file
+  const handleSave = async () => {
+    try {
+      await axios.put(`${API}/profile`, profileForm, {
+        headers: { Authorization: user.token },
+      });
+      setEditProfile(false);
+      setSnackbar({ open: true, success: true, msg: "Profile updated!" });
+      if (setUser) setUser((prev) => ({ ...prev, ...profileForm }));
+    } catch {
+      setSnackbar({ open: true, success: false, msg: "Profile update failed" });
+    }
+  };
 
   return (
     <Box
@@ -82,18 +80,60 @@ export default function ProfilePage({
           <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
             Edit Profile
           </Typography>
-          <TextField label="Name" fullWidth sx={{ mb: 2 }} value={profileForm.name}
-            onChange={e => setProfileForm(f => ({ ...f, name: e.target.value }))} />
-          <TextField label="Email" fullWidth sx={{ mb: 2 }} value={profileForm.email}
-            onChange={e => setProfileForm(f => ({ ...f, email: e.target.value }))} />
-          <TextField label="Phone" fullWidth sx={{ mb: 2 }} value={profileForm.phone}
-            onChange={e => setProfileForm(f => ({ ...f, phone: e.target.value }))} />
-          <TextField label="Institute" fullWidth sx={{ mb: 2 }} value={profileForm.institute}
-            onChange={e => setProfileForm(f => ({ ...f, institute: e.target.value }))} />
-          <TextField label="Address" fullWidth sx={{ mb: 2 }} value={profileForm.address}
-            onChange={e => setProfileForm(f => ({ ...f, address: e.target.value }))} />
-          <TextField label="ID Number" fullWidth sx={{ mb: 2 }} value={profileForm.idNumber}
-            onChange={e => setProfileForm(f => ({ ...f, idNumber: e.target.value }))} />
+          <TextField
+            label="Name"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={profileForm.name}
+            onChange={(e) =>
+              setProfileForm((f) => ({ ...f, name: e.target.value }))
+            }
+          />
+          <TextField
+            label="Email"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={profileForm.email}
+            onChange={(e) =>
+              setProfileForm((f) => ({ ...f, email: e.target.value }))
+            }
+          />
+          <TextField
+            label="Phone"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={profileForm.phone}
+            onChange={(e) =>
+              setProfileForm((f) => ({ ...f, phone: e.target.value }))
+            }
+          />
+          <TextField
+            label="Institute"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={profileForm.institute}
+            onChange={(e) =>
+              setProfileForm((f) => ({ ...f, institute: e.target.value }))
+            }
+          />
+          <TextField
+            label="Address"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={profileForm.address}
+            onChange={(e) =>
+              setProfileForm((f) => ({ ...f, address: e.target.value }))
+            }
+          />
+          <TextField
+            label="ID Number"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={profileForm.idNumber}
+            onChange={(e) =>
+              setProfileForm((f) => ({ ...f, idNumber: e.target.value }))
+            }
+          />
           <Box sx={{ display: "flex", gap: 2, mt: 2, width: "100%" }}>
             <Button
               fullWidth
@@ -102,11 +142,7 @@ export default function ProfilePage({
             >
               Cancel
             </Button>
-            <Button
-              fullWidth
-              variant="contained"
-              onClick={handleSave}
-            >
+            <Button fullWidth variant="contained" onClick={handleSave}>
               Save
             </Button>
           </Box>
