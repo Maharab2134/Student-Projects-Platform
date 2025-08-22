@@ -100,7 +100,6 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
   const [projectRatings, setProjectRatings] = useState([]);
-
   const [myOrders, setMyOrders] = useState([]);
   const [page, setPage] = useState("home");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -567,7 +566,11 @@ function App() {
           )}
 
           {user && !user.isAdmin && page === "orders" && (
-            <OrdersPage myOrders={myOrders} user={user} />
+            <OrdersPage
+              myOrders={myOrders}
+              setMyOrders={setMyOrders}
+              user={user}
+            />
           )}
 
           {user && !user.isAdmin && page === "profile" && (

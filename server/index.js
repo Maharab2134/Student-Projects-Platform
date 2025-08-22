@@ -59,6 +59,7 @@ const Order = mongoose.model(
     paymentMethod: String,
     transactionId: String,
     rating: { type: Number, default: 0 },
+    review: { type: String, default: "" }, // <-- review field
     status: { type: String, default: "Pending" },
     createdAt: { type: Date, default: Date.now },
   })
@@ -255,6 +256,25 @@ app.post("/api/order/:id/rate", auth, async (req, res) => {
   }
 
   res.json({ success: true });
+});
+
+// User give review in order (NEW ENDPOINT, not nested)
+app.post("/api/order/:id/review", auth, async (req, res) => {
+  const { review } = req.body;
+  if (!review || review.length < 2)
+    return res.status(400).json({ error: "Review too short" });
+
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({ error: "Order not found" });
+  if (order.userId !== req.user.id)
+    return res.status(403).json({ error: "Unauthorized" });
+  if (order.review && order.review.length > 0)
+    return res.status(400).json({ error: "Already reviewed" });
+
+  order.review = review;
+  await order.save();
+
+  res.json({ success: true, review });
 });
 
 // Get average rating for all projects
