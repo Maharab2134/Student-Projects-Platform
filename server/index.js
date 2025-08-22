@@ -15,21 +15,25 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error(err));
 
-// Models all the data models
+// User schema with unique constraints
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: {
+    type: String,
+    unique: true,
+    required: true,
+    lowercase: true,
+    trim: true,
+  },
+  phone: { type: String, required: true },
+  institute: { type: String, required: true },
+  address: { type: String, required: true },
+  idNumber: { type: String, unique: true, required: true, trim: true },
+  password: { type: String, required: true },
+  isAdmin: { type: Boolean, default: false },
+});
 
-const User = mongoose.model(
-  "User",
-  new mongoose.Schema({
-    name: String,
-    email: { type: String, unique: true },
-    phone: String,
-    institute: String,
-    address: String,
-    idNumber: String,
-    password: String,
-    isAdmin: { type: Boolean, default: false },
-  })
-);
+const User = mongoose.model("User", userSchema);
 
 const Project = mongoose.model(
   "Project",
@@ -135,7 +139,7 @@ app.post("/api/login", async (req, res) => {
   }
 
   // Student login
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: email.toLowerCase() });
   if (!user) return res.status(401).send("Invalid");
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) return res.status(401).send("Invalid");
@@ -160,6 +164,7 @@ app.post("/api/login", async (req, res) => {
 app.post("/api/register", async (req, res) => {
   const { name, email, phone, institute, address, idNumber, password } =
     req.body;
+
   if (
     !name ||
     !email ||
@@ -168,23 +173,41 @@ app.post("/api/register", async (req, res) => {
     !address ||
     !idNumber ||
     !password
-  )
+  ) {
     return res.status(400).send("Missing fields");
+  }
 
-  const hashed = await bcrypt.hash(password, 10);
   try {
+    // Check for existing user with same email or idNumber
+    const existingUser = await User.findOne({
+      $or: [{ email: email.toLowerCase() }, { idNumber: idNumber }],
+    });
+
+    if (existingUser) {
+      return res.status(400).send("Email or ID Number already registered");
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+
     const user = await User.create({
       name,
-      email,
+      email: email.toLowerCase(),
       phone,
       institute,
       address,
       idNumber,
       password: hashed,
     });
+
     res.json({ success: true });
   } catch (e) {
-    res.status(400).send("Email already exists");
+    if (e.code === 11000) {
+      // Duplicate key error
+      const field = Object.keys(e.keyValue)[0];
+      return res.status(400).send(`${field} already exists`);
+    }
+    console.error("Registration error:", e);
+    res.status(500).send("Server error");
   }
 });
 
@@ -446,6 +469,7 @@ app.put("/api/admin/request/:id/status", auth, admin, async (req, res) => {
   await CustomRequest.findByIdAndUpdate(req.params.id, { status });
   res.json({ success: true });
 });
+
 // Admin: delete custom request
 app.delete("/api/admin/request/:id", auth, admin, async (req, res) => {
   console.log("Delete request called for", req.params.id);
@@ -483,7 +507,9 @@ app.put("/api/admin/order/:id/pay", auth, admin, async (req, res) => {
   await Order.findByIdAndUpdate(req.params.id, { status: "Completed" });
   res.json({ success: true });
 });
+
 app.get("/api", (req, res) => {
   res.send("API is working!");
 });
+
 app.listen(5000, () => console.log("Server running on port 5000"));

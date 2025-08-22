@@ -38,7 +38,7 @@ import TermsPage from "./components/ULink/TermsPage";
 import PrivacyPolicyPage from "./components/ULink/PrivacyPolicyPage";
 
 const API = process.env.REACT_APP_API; // Ensure this is set in your .env file
-console.log("API:", API); // <-- এখানে দিন
+console.log("API:", API);
 
 const CATEGORIES = ["Web", "App", "ML"];
 
@@ -126,6 +126,28 @@ function App() {
     idNumber: user?.idNumber || "",
   });
 
+  // Lockout state
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [lockoutTime, setLockoutTime] = useState(0); // seconds remaining
+  const [isLockedOut, setIsLockedOut] = useState(false);
+  useEffect(() => {
+    let timer;
+    if (lockoutTime > 0) {
+      setIsLockedOut(true);
+      timer = setInterval(() => {
+        setLockoutTime((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setIsLockedOut(false);
+            setLoginAttempts(0); // reset attempts after lockout ends
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [lockoutTime]);
   // Effects
   useEffect(() => {
     if (user) {
@@ -171,6 +193,14 @@ function App() {
   // Handlers
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (isLockedOut) {
+      setSnackbar({
+        open: true,
+        success: false,
+        msg: `Too many failed attempts. Please wait ${lockoutTime} seconds.`,
+      });
+      return;
+    }
     try {
       const res = await axios.post(`${API}/login`, loginForm);
       const decoded = jwtDecode(res.data.token);
@@ -178,8 +208,25 @@ function App() {
       localStorage.setItem("token", res.data.token);
       setLoginOpen(false);
       setSnackbar({ open: true, success: true, msg: "Logged in!" });
+
+      // Reset attempts on successful login
+      setLoginAttempts(0);
     } catch {
-      setSnackbar({ open: true, success: false, msg: "Invalid credentials" });
+      const newAttempts = loginAttempts + 1;
+      setLoginAttempts(newAttempts);
+
+      if (newAttempts >= 3) {
+        // Exponential backoff: 30 * 2^(attempts - 3)
+        const waitTime = 30 * Math.pow(2, newAttempts - 3);
+        setLockoutTime(waitTime);
+        setSnackbar({
+          open: true,
+          success: false,
+          msg: `Too many failed attempts. Please wait ${waitTime} seconds.`,
+        });
+      } else {
+        setSnackbar({ open: true, success: false, msg: "Invalid credentials" });
+      }
     }
   };
 
@@ -214,7 +261,6 @@ function App() {
     });
     setAdminOrders(res.data);
   };
-
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
@@ -225,6 +271,22 @@ function App() {
         msg: "Registered! Please login.",
       });
       setAuthTab(0); // Switch to Login tab
+      setRegisterOpen(false); // Close register dialog
+      setLoginOpen(true); // Open login dialog
+
+      // Set login form email to registered email and clear password
+      setLoginForm({ email: registerForm.email, password: "" });
+
+      // Clear register form
+      setRegisterForm({
+        name: "",
+        email: "",
+        phone: "",
+        institute: "",
+        address: "",
+        idNumber: "",
+        password: "",
+      });
     } catch {
       setSnackbar({ open: true, success: false, msg: "Registration failed" });
     }
@@ -239,6 +301,19 @@ function App() {
     setAdminUsers([]);
     setSnackbar({ open: true, success: true, msg: "Logged out" });
     setPage("home");
+    setLoginForm({ email: "", password: "" });
+    setRegisterForm({
+      name: "",
+      email: "",
+      phone: "",
+      institute: "",
+      address: "",
+      idNumber: "",
+      password: "",
+    });
+
+    setLoginOpen(false);
+    setRegisterOpen(false);
   };
   const addToCart = (project) => {
     if (cart.find((p) => p._id === project._id)) return;
@@ -355,6 +430,7 @@ function App() {
           setRegisterForm={setRegisterForm}
           registerForm={registerForm}
           showPassword={showPassword}
+          loginForm={loginForm} // <-- Pass loginForm here
           setShowPassword={setShowPassword}
           showRegPassword={showRegPassword}
           setShowRegPassword={setShowRegPassword}
@@ -362,6 +438,8 @@ function App() {
           setSnackbar={setSnackbar}
           authTab={authTab}
           setAuthTab={setAuthTab}
+          isLockedOut={isLockedOut}
+          lockoutTime={lockoutTime}
         />
         <Container maxWidth="xl" sx={{ py: 4 }}>
           {page === "home" && (

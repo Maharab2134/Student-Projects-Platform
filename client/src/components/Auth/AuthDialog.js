@@ -20,12 +20,15 @@ import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
+
 export default function AuthDialog({
   open,
   onClose,
   onLogin,
   onRegister,
+  loginForm,
   setLoginForm,
+  registerForm,
   setRegisterForm,
   showPassword,
   setShowPassword,
@@ -35,6 +38,8 @@ export default function AuthDialog({
   setSnackbar,
   authTab,
   setAuthTab,
+  isLockedOut,
+  lockoutTime,
 }) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
@@ -73,6 +78,7 @@ export default function AuthDialog({
                 name="email"
                 fullWidth
                 sx={{ mb: 2 }}
+                value={loginForm.email}
                 onChange={(e) =>
                   setLoginForm((f) => ({ ...f, email: e.target.value }))
                 }
@@ -84,6 +90,7 @@ export default function AuthDialog({
                 type={showPassword ? "text" : "password"}
                 fullWidth
                 sx={{ mb: 2 }}
+                value={loginForm.password}
                 onChange={(e) =>
                   setLoginForm((f) => ({ ...f, password: e.target.value }))
                 }
@@ -116,8 +123,9 @@ export default function AuthDialog({
                   mt: 1,
                   fontSize: 17,
                 }}
+                disabled={isLockedOut}
               >
-                Login
+                {isLockedOut ? `Wait ${lockoutTime}s` : "Login"}
               </Button>
             </Box>
           ) : (
@@ -127,6 +135,7 @@ export default function AuthDialog({
                 name="name"
                 fullWidth
                 sx={{ mb: 2 }}
+                value={registerForm.name}
                 onChange={(e) =>
                   setRegisterForm((f) => ({ ...f, name: e.target.value }))
                 }
@@ -136,6 +145,7 @@ export default function AuthDialog({
                 name="email"
                 fullWidth
                 sx={{ mb: 2 }}
+                value={registerForm.email}
                 onChange={(e) =>
                   setRegisterForm((f) => ({ ...f, email: e.target.value }))
                 }
@@ -145,6 +155,7 @@ export default function AuthDialog({
                 name="phone"
                 fullWidth
                 sx={{ mb: 2 }}
+                value={registerForm.phone}
                 onChange={(e) =>
                   setRegisterForm((f) => ({ ...f, phone: e.target.value }))
                 }
@@ -154,6 +165,7 @@ export default function AuthDialog({
                 name="institute"
                 fullWidth
                 sx={{ mb: 2 }}
+                value={registerForm.institute}
                 onChange={(e) =>
                   setRegisterForm((f) => ({ ...f, institute: e.target.value }))
                 }
@@ -163,6 +175,7 @@ export default function AuthDialog({
                 name="address"
                 fullWidth
                 sx={{ mb: 2 }}
+                value={registerForm.address}
                 onChange={(e) =>
                   setRegisterForm((f) => ({ ...f, address: e.target.value }))
                 }
@@ -172,6 +185,7 @@ export default function AuthDialog({
                 name="idNumber"
                 fullWidth
                 sx={{ mb: 2 }}
+                value={registerForm.idNumber}
                 onChange={(e) =>
                   setRegisterForm((f) => ({ ...f, idNumber: e.target.value }))
                 }
@@ -182,6 +196,7 @@ export default function AuthDialog({
                 type={showRegPassword ? "text" : "password"}
                 fullWidth
                 sx={{ mb: 2 }}
+                value={registerForm.password}
                 onChange={(e) =>
                   setRegisterForm((f) => ({ ...f, password: e.target.value }))
                 }
