@@ -379,10 +379,7 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                     )}
 
                     {/* Project Title (truncated, expandable) */}
-                    <Tooltip
-                      arrow
-                      disableHoverListener={expandedTitles[o._id]}
-                    >
+                    <Tooltip arrow disableHoverListener={expandedTitles[o._id]}>
                       <Typography
                         variant="h6"
                         fontWeight={700}
