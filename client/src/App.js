@@ -17,6 +17,7 @@ import Navbar from "./components/Utility/Navbar";
 import Footer from "./components/Utility/Footer";
 import AuthDialog from "./components/Auth/AuthDialog";
 import ProjectGrid from "./components/Utility/ProjectGrid";
+import ProjectDetailsDialog from "./components/Utility/ProjectDetailsDialog";
 import AdminProductsView from "./components/Admin/AdminProductsView";
 import AdminOrdersView from "./components/Admin/AdminOrdersView";
 import AdminUsersView from "./components/Admin/AdminUsersView";
@@ -124,7 +125,8 @@ function App() {
     address: user?.address || "",
     idNumber: user?.idNumber || "",
   });
-
+  const [projectDialogOpen, setProjectDialogOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null); // <-- For details page
   // Lockout state
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [lockoutTime, setLockoutTime] = useState(0); // seconds remaining
@@ -534,6 +536,14 @@ function App() {
                   selectedCategory={selectedCategory}
                   search={search}
                   projectRatings={projectRatings}
+                  setSelectedProject={setSelectedProject} // Pass this down
+                  setProjectDialogOpen={setProjectDialogOpen}
+                />
+
+                <ProjectDetailsDialog
+                  open={projectDialogOpen}
+                  onClose={() => setProjectDialogOpen(false)}
+                  project={selectedProject}
                 />
               </section>
               {user && !user.isAdmin && <CustomProjectModal user={user} />}
@@ -549,6 +559,7 @@ function App() {
               </section>
             </>
           )}
+
           {user && !user.isAdmin && page === "cart" && (
             <CartPage
               cart={cart}

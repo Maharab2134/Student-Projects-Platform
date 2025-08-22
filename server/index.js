@@ -32,9 +32,15 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   isAdmin: { type: Boolean, default: false },
 });
-
 const User = mongoose.model("User", userSchema);
 
+const reviewSchema = new mongoose.Schema({
+  userId: String,
+  userName: String,
+  rating: Number,
+  review: String,
+  date: { type: Date, default: Date.now },
+});
 const Project = mongoose.model(
   "Project",
   new mongoose.Schema({
@@ -47,6 +53,7 @@ const Project = mongoose.model(
     sold: { type: String, default: "0" },
     duration: String,
     rating: { type: Number, default: 0 }, // average rating
+    reviews: [reviewSchema], // array of reviews
   })
 );
 
@@ -227,7 +234,7 @@ app.put("/api/profile", auth, async (req, res) => {
   }
 });
 
-// User give rating in project.
+// User give rating in project (optional, can be removed if not used)
 app.post("/api/order/:id/rate", auth, async (req, res) => {
   const { rating } = req.body;
   if (!rating) return res.status(400).json({ error: "Rating required" });
@@ -258,9 +265,9 @@ app.post("/api/order/:id/rate", auth, async (req, res) => {
   res.json({ success: true });
 });
 
-// User give review in order (NEW ENDPOINT, not nested)
+// User give review in order (and save in project)
 app.post("/api/order/:id/review", auth, async (req, res) => {
-  const { review } = req.body;
+  const { review, rating } = req.body;
   if (!review || review.length < 2)
     return res.status(400).json({ error: "Review too short" });
 
@@ -271,26 +278,61 @@ app.post("/api/order/:id/review", auth, async (req, res) => {
   if (order.review && order.review.length > 0)
     return res.status(400).json({ error: "Already reviewed" });
 
+  // Save review and rating in order
   order.review = review;
+  if (rating) order.rating = rating;
   await order.save();
+
+  // Save review in each project in the order
+  for (const p of order.projects) {
+    await Project.findByIdAndUpdate(
+      p._id,
+      {
+        $push: {
+          reviews: {
+            userId: req.user.id,
+            userName: req.user.name,
+            rating: rating || order.rating || 0,
+            review,
+            date: new Date(),
+          },
+        },
+      },
+      { new: true }
+    );
+
+    // Update average rating in project
+    const project = await Project.findById(p._id);
+    if (project && project.reviews && project.reviews.length > 0) {
+      const ratings = project.reviews
+        .map((r) => r.rating)
+        .filter((r) => typeof r === "number" && !isNaN(r));
+      const avg =
+        ratings.length > 0
+          ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+          : 0;
+      project.rating = avg;
+      await project.save();
+    }
+  }
 
   res.json({ success: true, review });
 });
 
-// Get average rating for all projects
+// Get average rating for all projects (from reviews array)
 app.get("/api/project-ratings", async (req, res) => {
   const projects = await Project.find();
-  const orders = await Order.find({ rating: { $gt: 0 } });
 
   const projectRatings = projects.map((project) => {
-    const relatedOrders = orders.filter((order) =>
-      order.projects.some((p) => p._id == project._id.toString())
-    );
-    const ratings = relatedOrders.map((order) => order.rating);
+    const ratings = (project.reviews || [])
+      .map((review) => review.rating)
+      .filter((r) => typeof r === "number" && !isNaN(r));
+
     const avg =
       ratings.length > 0
         ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(2)
         : null;
+
     return {
       projectId: project._id.toString(),
       averageRating: avg,
@@ -305,6 +347,11 @@ app.get("/api/project-ratings", async (req, res) => {
 app.get("/api/projects", async (req, res) => {
   const projects = await Project.find();
   res.json(projects);
+});
+app.get("/api/project/:id", async (req, res) => {
+  const project = await Project.findById(req.params.id);
+  if (!project) return res.status(404).json({ error: "Not found" });
+  res.json(project);
 });
 
 // Get all team members

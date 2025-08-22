@@ -12,6 +12,8 @@ export default function ProjectGrid({
   selectedCategory,
   search,
   projectRatings,
+  setSelectedProject, // <-- for dialog
+  setProjectDialogOpen, // <-- for dialog
 }) {
   const [expandedDesc, setExpandedDesc] = useState(null);
   const [expandedTitle, setExpandedTitle] = useState(null);
@@ -68,7 +70,11 @@ export default function ProjectGrid({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
             whileHover={{ scale: 1.03 }}
-            style={{ width: "100%" }}
+            style={{ width: "100%", cursor: "pointer" }}
+            onClick={() => {
+              setSelectedProject(project);
+              setProjectDialogOpen(true);
+            }}
           >
             <Box
               sx={{
@@ -151,7 +157,8 @@ export default function ProjectGrid({
                     maxHeight: expandedTitle === project._id ? "none" : "1.5em",
                     lineHeight: "1.5em",
                   }}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card click
                     if (shouldTruncateTitle) {
                       setExpandedTitle(
                         expandedTitle === project._id ? null : project._id
@@ -198,11 +205,12 @@ export default function ProjectGrid({
                     width: "100%",
                     textAlign: "justify",
                   }}
-                  onClick={() =>
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card click
                     setExpandedDesc(
                       expandedDesc === project._id ? null : project._id
-                    )
-                  }
+                    );
+                  }}
                 >
                   {expandedDesc === project._id
                     ? project.desc
@@ -261,7 +269,7 @@ export default function ProjectGrid({
                   ))}
                 </Stack>
 
-                {/* Duration, Rating and Sold - arranged horizontally with proper spacing */}
+                {/* Duration, Rating and Sold */}
                 <Box
                   sx={{
                     display: "flex",
@@ -271,7 +279,6 @@ export default function ProjectGrid({
                     width: "100%",
                   }}
                 >
-                  {/* Duration */}
                   {project.duration && (
                     <Chip
                       label={project.duration}
@@ -285,8 +292,6 @@ export default function ProjectGrid({
                       }}
                     />
                   )}
-
-                  {/* Rating and Sold */}
                   <Box
                     sx={{
                       display: "flex",
@@ -294,7 +299,6 @@ export default function ProjectGrid({
                       gap: 1.5,
                     }}
                   >
-                    {/* Rating */}
                     {projectRatings && (
                       <Tooltip
                         title={(() => {
@@ -320,8 +324,6 @@ export default function ProjectGrid({
                         </span>
                       </Tooltip>
                     )}
-
-                    {/* Sold */}
                     <Chip
                       label={`Sold: ${project.sold || 0}K`}
                       size="small"
@@ -361,7 +363,10 @@ export default function ProjectGrid({
                           background: "#1565c0",
                         },
                       }}
-                      onClick={user ? () => addToCart(project) : openLogin}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent card click
+                        user ? addToCart(project) : openLogin();
+                      }}
                       component={motion.button}
                       whileTap={{ scale: 0.96 }}
                     >

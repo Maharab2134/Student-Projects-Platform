@@ -123,36 +123,38 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handleRate = async (orderId, newValue) => {
+  // Only update local state for rating
+  const handleRate = (orderId, newValue) => {
     setRatings((prev) => ({ ...prev, [orderId]: newValue }));
-    try {
-      await axios.post(
-        `${API}/order/${orderId}/rate`,
-        { rating: newValue },
-        { headers: { Authorization: user.token } }
-      );
-    } catch {
-      alert("Failed to save rating");
-    }
   };
 
   const getStatusIndex = (status) => {
     return steps.findIndex((step) => step.label === status);
   };
 
+  // Submit both review and rating together
   const handleReviewSubmit = async (orderId) => {
     if (!reviews[orderId] || !reviews[orderId].trim()) return;
+    if (!ratings[orderId]) {
+      alert("Please provide a rating before submitting your review.");
+      return;
+    }
     setReviewLoading((prev) => ({ ...prev, [orderId]: true }));
     try {
       await axios.post(
         `${API}/order/${orderId}/review`,
-        { review: reviews[orderId] },
+        {
+          review: reviews[orderId],
+          rating: ratings[orderId],
+        },
         { headers: { Authorization: user.token } }
       );
 
       setMyOrders((prevOrders) =>
         prevOrders.map((order) =>
-          order._id === orderId ? { ...order, review: reviews[orderId] } : order
+          order._id === orderId
+            ? { ...order, review: reviews[orderId], rating: ratings[orderId] }
+            : order
         )
       );
       setReviews((prev) => ({ ...prev, [orderId]: "" }));
@@ -219,7 +221,13 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
             <Typography
               variant="subtitle1"
               fontWeight={700}
-              sx={{ textAlign: "center", color: theme.palette.text.primary }}
+              sx={{
+                textAlign: "center",
+                background: "linear-gradient(90deg, #0f2027 0%, #2c5364 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontWeight: 700,
+              }}
             >
               Order Status Flow Guide
             </Typography>
@@ -322,7 +330,7 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                   display: "flex",
                   flexDirection: "column",
                   borderRadius: 2,
-                  p: 4,
+                  p: 3,
                   boxShadow:
                     theme.palette.mode === "dark"
                       ? "0 8px 32px 0 rgba(0,0,0,0.45)"
@@ -525,14 +533,18 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                       >
                         <Rating
                           name={`order-rating-${o._id}`}
-                          value={ratings[o._id] || o.rating || 0}
+                          value={
+                            o.review
+                              ? o.rating // If already reviewed, show saved rating
+                              : ratings[o._id] || 0 // Else, show selected rating
+                          }
                           onChange={(_, newValue) => {
-                            if (!o.rating && !ratings[o._id]) {
+                            if (!o.review) {
                               handleRate(o._id, newValue);
                             }
                           }}
                           size="medium"
-                          disabled={Boolean(o.rating || ratings[o._id])}
+                          disabled={Boolean(o.review)}
                         />
                       </StyledRating>
 
@@ -598,7 +610,8 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                               disabled={
                                 reviewLoading[o._id] ||
                                 !reviews[o._id] ||
-                                !reviews[o._id].trim()
+                                !reviews[o._id].trim() ||
+                                !ratings[o._id] // Disable if no rating
                               }
                               sx={{ borderRadius: 2 }}
                             >
