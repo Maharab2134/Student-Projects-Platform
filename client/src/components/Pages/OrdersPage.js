@@ -169,7 +169,7 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
           mx: "auto",
         }}
       >
-        <CardContent sx={{ p: 2 }}>
+        <CardContent sx={{ p:2 }}>
           <Box
             display="flex"
             alignItems="center"

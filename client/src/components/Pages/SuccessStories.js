@@ -66,9 +66,9 @@ const stories = [
     field: "App Development",
   },
   {
-    name: "Tanvir Ahmed",
-    university: "DU",
-    img: "https://images.unsplash.com/photo-1614282701125-3f6c28f1849f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    name: "Jubayer Ahmed",
+    university: "BUBT",
+    img: "https://res.cloudinary.com/dyl34zggp/image/upload/v1755870401/IMG_20250408_152150_996_melskp.webp",
     text: "I learned a lot from the ML projects here. Very helpful for my thesis.",
     rating: 5,
     field: "ML",
