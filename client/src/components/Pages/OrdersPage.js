@@ -3,7 +3,6 @@ import {
   Box,
   Typography,
   Chip,
-  Avatar,
   Tooltip,
   Grid,
   Stepper,
@@ -37,7 +36,30 @@ import {
 } from "@mui/icons-material";
 import axios from "axios";
 
-// Custom styled rating component with fixed colors
+// Glassmorphism Card
+const GlassCard = styled(Card)(({ theme }) => ({
+  background:
+    theme.palette.mode === "dark"
+      ? "rgba(30, 32, 40, 0.55)"
+      : "rgba(255,255,255,0.55)",
+  borderRadius: 24,
+  boxShadow:
+    theme.palette.mode === "dark"
+      ? "0 8px 32px 0 rgba(0,0,0,0.45)"
+      : "0 8px 32px 0 rgba(31, 38, 135, 0.18)",
+  backdropFilter: "blur(12px)",
+  WebkitBackdropFilter: "blur(12px)",
+  border: "1px solid rgba(255,255,255,0.18)",
+  transition: "box-shadow 0.3s, transform 0.3s",
+  "&:hover": {
+    boxShadow:
+      theme.palette.mode === "dark"
+        ? "0 16px 32px 0 rgba(0,0,0,0.65)"
+        : "0 16px 32px 0 rgba(31, 38, 135, 0.25)",
+    transform: "translateY(-4px) scale(1.02)",
+  },
+}));
+
 const StyledRating = styled(Box)(({ theme }) => ({
   "& .MuiRating-icon": {
     color: theme.palette.warning.main,
@@ -96,6 +118,7 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
   const [ratings, setRatings] = React.useState({});
   const [reviews, setReviews] = React.useState({});
   const [reviewLoading, setReviewLoading] = React.useState({});
+  const [expandedTitles, setExpandedTitles] = React.useState({});
   const API = process.env.REACT_APP_API;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -116,6 +139,7 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
   const getStatusIndex = (status) => {
     return steps.findIndex((step) => step.label === status);
   };
+
   const handleReviewSubmit = async (orderId) => {
     if (!reviews[orderId] || !reviews[orderId].trim()) return;
     setReviewLoading((prev) => ({ ...prev, [orderId]: true }));
@@ -137,56 +161,71 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
     }
     setReviewLoading((prev) => ({ ...prev, [orderId]: false }));
   };
+
+  // Toggle title expand/collapse
+  const handleToggleTitle = (orderId) => {
+    setExpandedTitles((prev) => ({
+      ...prev,
+      [orderId]: !prev[orderId],
+    }));
+  };
+
   return (
-    <Box sx={{ maxWidth: 1200, mx: "auto", mt: 4, p: isMobile ? 2 : 3 }}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        py: 6,
+        px: isMobile ? 1 : 4,
+        background: theme.palette.background.default,
+        fontFamily: "Inter, Roboto, Arial, sans-serif",
+      }}
+    >
       {/* Page title */}
       <Typography
         variant="h4"
-        fontWeight={700}
+        fontWeight={600}
         align="center"
         sx={{
-          mb: 3,
-          color: "primary.main",
-          background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          textShadow: "0px 2px 4px rgba(0,0,0,0.1)",
+          mb: 5,
+          letterSpacing: 1,
+          color: theme.palette.text.primary,
+          textShadow:
+            theme.palette.mode === "dark"
+              ? "0 2px 12px rgba(0,0,0,0.25)"
+              : "0 2px 12px rgba(30, 64, 175, 0.08)",
         }}
       >
         My Orders
       </Typography>
 
       {/* Status Flow Section */}
-      <Card
+      <GlassCard
         sx={{
-          mb: 4,
+          mb: 5,
           borderRadius: 2,
-          boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
-          background: "linear-gradient(to bottom, #ffffff, #f8fbff)",
-          border: "1px solid",
-          borderColor: "divider",
-          maxWidth: 500,
+          maxWidth: 420,
           mx: "auto",
+          p: 0.2,
         }}
       >
-        <CardContent sx={{ p:2 }}>
+        <CardContent sx={{ p: 1 }}>
           <Box
             display="flex"
             alignItems="center"
             justifyContent="center"
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer", mt: 1 }}
             onClick={() => setOpenStatusTree((prev) => !prev)}
           >
             <Typography
-              variant="h6"
-              fontWeight={600}
-              sx={{ textAlign: "center", color: "primary.dark" }}
+              variant="subtitle1"
+              fontWeight={700}
+              sx={{ textAlign: "center", color: theme.palette.text.primary }}
             >
               Order Status Flow Guide
             </Typography>
             <IconButton
               size="small"
-              sx={{ ml: 1, color: "primary.main" }}
+              sx={{ ml: 0.5, color: "text.secondary" }}
               aria-label={openStatusTree ? "Hide" : "Show"}
             >
               {openStatusTree ? <ExpandLess /> : <ExpandMore />}
@@ -196,32 +235,37 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
             <Stepper
               orientation="vertical"
               activeStep={-1}
-              sx={{ pl: 0, mt: 2 }}
+              sx={{
+                pl: 5,
+                mt: 1,
+                "& .MuiStepLabel-label": {
+                  color: theme.palette.text.primary,
+                  fontWeight: 500,
+                  fontSize: "0.95rem",
+                },
+                "& .MuiStepConnector-root": {
+                  minHeight: 12,
+                },
+              }}
             >
-              {steps.map((step, index) => (
+              {steps.map((step) => (
                 <Step key={step.label} sx={{ pl: 0 }}>
                   <StepLabel
                     icon={React.cloneElement(step.icon, {
-                      sx: { fontSize: 28 },
+                      sx: { fontSize: 24 },
                     })}
-                    sx={{
-                      ".MuiStepLabel-label": {
-                        fontWeight: 600,
-                        color: `${step.color}.main`,
-                        fontSize: "1rem",
-                      },
-                    }}
                   >
-                    <Stack direction="row" alignItems="center" spacing={1.5}>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                      flexWrap="wrap"
+                    >
                       <Chip
                         label={step.label}
                         color={step.color}
                         size="small"
-                        sx={{
-                          fontWeight: 700,
-                          px: 1,
-                          fontSize: "0.8rem",
-                        }}
+                        sx={{ fontWeight: 600, fontSize: "0.8rem" }}
                       />
                       <Typography
                         variant="body2"
@@ -237,51 +281,54 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
             </Stepper>
           </Collapse>
         </CardContent>
-      </Card>
+      </GlassCard>
 
       {/* Empty State */}
       {myOrders.length === 0 && (
-        <Box
+        <GlassCard
           sx={{
             textAlign: "center",
             mt: 10,
             p: 4,
-            borderRadius: 3,
-            backgroundColor: "grey.50",
+            borderRadius: 4,
             maxWidth: 500,
             mx: "auto",
           }}
         >
-          <LocalShipping sx={{ fontSize: 60, color: "grey.400", mb: 2 }} />
+          <LocalShipping
+            sx={{ fontSize: 60, color: theme.palette.info.light, mb: 2 }}
+          />
           <Typography variant="h6" color="text.secondary" gutterBottom>
             No orders yet
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Your orders will appear here once you make a purchase.
           </Typography>
-        </Box>
+        </GlassCard>
       )}
 
       {/* Orders Grid */}
-      <Grid container spacing={3} sx={{ mt: 1 }}>
+      <Grid container spacing={4} sx={{ mt: 1 }}>
         {myOrders.map((o) => {
           const statusIndex = getStatusIndex(o.status);
+          const projectTitle = o.projects[0]?.title || "";
+          const isTitleLong = projectTitle.length > 25;
           return (
-            <Grid item xs={12} sm={6} md={4} key={o._id}>
-              <Card
+            <Grid item xs={12} sm={6} md={3} key={o._id}>
+              <GlassCard
                 sx={{
                   height: "100%",
+                  width: "100%",
                   display: "flex",
                   flexDirection: "column",
                   borderRadius: 2,
-                  padding: 5,
-                  boxShadow: "0 8px 16px rgba(0,0,0,0.08)",
-                  transition: "transform 0.3s, box-shadow 0.3s",
-                  "&:hover": {
-                    boxShadow: "0 12px 20px rgba(0,0,0,0.15)",
-                    transform: "translateY(-4px)",
-                  },
+                  p: 4,
+                  boxShadow:
+                    theme.palette.mode === "dark"
+                      ? "0 8px 32px 0 rgba(0,0,0,0.45)"
+                      : "0 8px 32px 0 rgba(31, 38, 135, 0.18)",
                   overflow: "visible",
+                  minHeight: 420,
                 }}
               >
                 <CardContent
@@ -292,50 +339,89 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                     flexDirection: "column",
                   }}
                 >
-                  {/* Order header with image and basic info */}
+                  {/* Image on top, then title, then date */}
                   <Box
-                    sx={{ display: "flex", alignItems: "flex-start", mb: 2 }}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      mb: 2,
+                    }}
                   >
-                    {/* Project Image (first project) */}
+                    {/* Project Image (on top) */}
                     {o.projects[0] && (
-                      <Tooltip title={o.projects[0].title} arrow>
-                        <Avatar
-                          variant="rounded"
+                      <Box
+                        sx={{
+                          width: 102,
+                          height: 102,
+                          border: `2px solid ${theme.palette.info.light}`,
+                          bgcolor: "#f5f5f5",
+                          mb: 1.5,
+                          boxShadow: 2,
+                          borderRadius: 1,
+                          overflow: "hidden", // prevents overflow
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Box
+                          component="img"
                           src={o.projects[0].img}
-                          alt={o.projects[0].title}
+                          alt={projectTitle}
                           sx={{
-                            width: 60,
-                            height: 60,
-                            border: "2px solid",
-                            borderColor: "primary.light",
-                            bgcolor: "#f5f5f5",
-                            mr: 2,
-                            boxShadow: 2,
+                            maxWidth: "100%",
+                            maxHeight: "100%",
+                            objectFit: "contain", // ensures full image is visible
                           }}
                         />
-                      </Tooltip>
+                      </Box>
                     )}
 
-                    <Box sx={{ flexGrow: 1 }}>
+                    {/* Project Title (truncated, expandable) */}
+                    <Tooltip
+                      arrow
+                      disableHoverListener={expandedTitles[o._id]}
+                    >
                       <Typography
                         variant="h6"
                         fontWeight={700}
-                        sx={{ mb: 0.5 }}
-                      >
-                        Order #{o._id.slice(-6).toUpperCase()}
-                      </Typography>
-                      <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          color: "text.secondary",
+                          mb: 0.5,
+                          maxWidth: 200,
+                          cursor: isTitleLong ? "pointer" : "default",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: expandedTitles[o._id]
+                            ? "normal"
+                            : "nowrap",
+                          wordBreak: "break-word",
+                          textAlign: "left",
+                          transition: "all 0.2s",
+                          color: theme.palette.text.primary,
+                        }}
+                        onClick={() => {
+                          if (isTitleLong) handleToggleTitle(o._id);
                         }}
                       >
-                        <CalendarToday sx={{ fontSize: 16, mr: 0.5 }} />
-                        <Typography variant="caption">
-                          {new Date(o.createdAt).toLocaleString()}
-                        </Typography>
-                      </Box>
+                        {projectTitle}
+                      </Typography>
+                    </Tooltip>
+
+                    {/* Date */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        color: theme.palette.text.secondary,
+                        fontSize: 14,
+                        mt: 0.5,
+                      }}
+                    >
+                      <CalendarToday sx={{ fontSize: 16, mr: 0.5 }} />
+                      <Typography variant="caption">
+                        {new Date(o.createdAt).toLocaleString()}
+                      </Typography>
                     </Box>
                   </Box>
 
@@ -365,7 +451,7 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                             : "default"
                         }
                         size="small"
-                        sx={{ fontWeight: 700 }}
+                        sx={{ fontWeight: 700, fontSize: 14, px: 1.5 }}
                       />
 
                       <Typography variant="body2" color="text.secondary">
@@ -378,20 +464,23 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                         variant="determinate"
                         value={(statusIndex / (steps.length - 1)) * 100}
                         sx={{
-                          height: 6,
+                          height: 7,
                           borderRadius: 3,
                           mt: 1,
-                          backgroundColor: "grey.200",
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? "rgba(144,202,249,0.10)"
+                              : "rgba(144,202,249,0.15)",
                           "& .MuiLinearProgress-bar": {
                             borderRadius: 3,
                             backgroundColor:
                               o.status === "Pending"
-                                ? "warning.main"
+                                ? theme.palette.warning.main
                                 : o.status === "Accepted"
-                                ? "info.main"
+                                ? theme.palette.info.main
                                 : o.status === "Working"
-                                ? "primary.main"
-                                : "success.main",
+                                ? theme.palette.primary.main
+                                : theme.palette.success.main,
                           },
                         }}
                       />
@@ -401,8 +490,14 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                   {/* Order total */}
                   <Typography
                     variant="h6"
-                    color="primary"
-                    sx={{ mt: 0.3, mb: 1, textAlign: "center" }}
+                    sx={{
+                      mt: 0.3,
+                      mb: 1,
+                      textAlign: "center",
+                      fontWeight: 800,
+                      letterSpacing: 1,
+                      color: theme.palette.primary.main,
+                    }}
                   >
                     Total: BDT {o.total}k
                   </Typography>
@@ -478,6 +573,13 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                             variant="outlined"
                             size="small"
                             inputProps={{ maxLength: 500 }}
+                            sx={{
+                              background:
+                                theme.palette.mode === "dark"
+                                  ? "rgba(30,32,40,0.7)"
+                                  : "rgba(255,255,255,0.7)",
+                              borderRadius: 2,
+                            }}
                           />
                           <Box
                             display="flex"
@@ -514,7 +616,10 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                           sx={{
                             mt: 1,
                             p: 2,
-                            bgcolor: "grey.50",
+                            bgcolor:
+                              theme.palette.mode === "dark"
+                                ? "rgba(144,202,249,0.10)"
+                                : "rgba(144,202,249,0.10)",
                             borderRadius: 2,
                           }}
                         >
@@ -536,7 +641,7 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                     </Box>
                   )}
                 </CardContent>
-              </Card>
+              </GlassCard>
             </Grid>
           );
         })}
