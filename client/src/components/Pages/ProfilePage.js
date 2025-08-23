@@ -201,7 +201,7 @@ export default function ProfilePage({
 
   // Apply dark mode to the entire document
   useEffect(() => {
-    document.body.style.backgroundColor = darkMode ? "#121212" : "#f5f5f5";
+    document.body.style.backgroundColor = darkMode ? "" : "#f5f5f5";
     document.body.style.color = darkMode ? "#fff" : "inherit";
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);

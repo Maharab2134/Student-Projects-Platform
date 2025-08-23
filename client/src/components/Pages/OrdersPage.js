@@ -320,7 +320,7 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
         {myOrders.map((o) => {
           const statusIndex = getStatusIndex(o.status);
           const projectTitle = o.projects[0]?.title || "";
-          const isTitleLong = projectTitle.length > 25;
+          const isTitleLong = projectTitle.length >20;
           return (
             <Grid item xs={12} sm={6} md={3} key={o._id}>
               <GlassCard
@@ -387,7 +387,15 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                     )}
 
                     {/* Project Title (truncated, expandable) */}
-                    <Tooltip arrow disableHoverListener={expandedTitles[o._id]}>
+                    <Tooltip
+                      arrow
+                      title={
+                        isTitleLong && !expandedTitles[o._id]
+                          ? projectTitle
+                          : ""
+                      }
+                      disableHoverListener={expandedTitles[o._id]}
+                    >
                       <Typography
                         variant="h6"
                         fontWeight={700}
@@ -404,12 +412,26 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
                           textAlign: "left",
                           transition: "all 0.2s",
                           color: theme.palette.text.primary,
+                          position: "relative",
                         }}
                         onClick={() => {
                           if (isTitleLong) handleToggleTitle(o._id);
                         }}
                       >
                         {projectTitle}
+                        {isTitleLong && (
+                          <span
+                            style={{
+                              color: "#1976d2",
+                              fontWeight: 600,
+                              fontSize: "0.9em",
+                              marginLeft: 6,
+                              cursor: "pointer",
+                            }}
+                          >
+                            {expandedTitles[o._id] ? ".." : " .."}
+                          </span>
+                        )}
                       </Typography>
                     </Tooltip>
 
