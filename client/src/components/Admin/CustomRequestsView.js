@@ -108,7 +108,7 @@ export default function AdminCustomRequests({ user }) {
   const handleDeleteRequest = async (id) => {
     setDeletingId(id);
     try {
-      await axios.delete(`${API}admin/request/${id}`, {
+      await axios.delete(`${API}/admin/request/${id}`, {
         headers: { Authorization: user.token },
       });
       setRequests((prev) => prev.filter((req) => req._id !== id));
