@@ -112,7 +112,10 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
         PaperProps={{
           sx: {
             borderRadius: isMobile ? 0 : 2,
-            background: "linear-gradient(to bottom, #f9fafb, #ffffff)",
+            background:
+              theme.palette.mode === "dark"
+                ? "linear-gradient(to bottom, #121212, #1e1e1e)"
+                : "linear-gradient(to bottom, #f9fafb, #ffffff)",
             overflow: "hidden",
             boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
             maxHeight: isMobile ? "100vh" : "90vh",
@@ -519,16 +522,38 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
                     p: 4,
                     textAlign: "center",
                     borderRadius: 2,
-                    bgcolor: "grey.50",
+                    bgcolor:
+                      theme.palette.mode === "dark" ? "grey.900" : "grey.50",
                   }}
                 >
                   <Person
-                    sx={{ fontSize: 48, color: "text.secondary", mb: 1 }}
+                    sx={{
+                      fontSize: 48,
+                      color:
+                        theme.palette.mode === "dark"
+                          ? "grey.500"
+                          : "text.secondary",
+                      mb: 1,
+                    }}
                   />
-                  <Typography color="text.secondary" gutterBottom>
+                  <Typography
+                    color={
+                      theme.palette.mode === "dark"
+                        ? "grey.400"
+                        : "text.secondary"
+                    }
+                    gutterBottom
+                  >
                     No reviews yet.
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    color={
+                      theme.palette.mode === "dark"
+                        ? "grey.500"
+                        : "text.secondary"
+                    }
+                  >
                     Be the first to review this project!
                   </Typography>
                 </Card>
@@ -539,7 +564,11 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
               <Typography variant="h6" fontWeight={600} gutterBottom>
                 Project Details
               </Typography>
-              <Typography variant="body1" paragraph>
+              <Typography
+                variant="body1"
+                paragraph
+                sx={{ color: "text.secondary" }}
+              >
                 This project includes comprehensive features and full
                 documentation. The package comes with source code, installation
                 guide, and 6 months of technical support.
@@ -556,19 +585,27 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
               <Stack spacing={1}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <ThumbUp color="primary" sx={{ fontSize: 20, mr: 1.5 }} />
-                  <Typography variant="body2">Full source code</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Full source code
+                  </Typography>
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <ThumbUp color="primary" sx={{ fontSize: 20, mr: 1.5 }} />
-                  <Typography variant="body2">Documentation</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Documentation
+                  </Typography>
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <ThumbUp color="primary" sx={{ fontSize: 20, mr: 1.5 }} />
-                  <Typography variant="body2">6 months support</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    6 months support
+                  </Typography>
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <ThumbUp color="primary" sx={{ fontSize: 20, mr: 1.5 }} />
-                  <Typography variant="body2">Future updates</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Future updates
+                  </Typography>
                 </Box>
               </Stack>
             </TabPanel>
