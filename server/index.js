@@ -278,12 +278,10 @@ app.post("/api/order/:id/review", auth, async (req, res) => {
   if (order.review && order.review.length > 0)
     return res.status(400).json({ error: "Already reviewed" });
 
-  // Save review and rating in order
   order.review = review;
   if (rating) order.rating = rating;
   await order.save();
 
-  // Save review in each project in the order
   for (const p of order.projects) {
     await Project.findByIdAndUpdate(
       p._id,
@@ -301,7 +299,6 @@ app.post("/api/order/:id/review", auth, async (req, res) => {
       { new: true }
     );
 
-    // Update average rating in project
     const project = await Project.findById(p._id);
     if (project && project.reviews && project.reviews.length > 0) {
       const ratings = project.reviews

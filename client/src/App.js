@@ -127,6 +127,7 @@ function App() {
   });
   const [projectDialogOpen, setProjectDialogOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null); // <-- For details page
+
   // Lockout state
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [lockoutTime, setLockoutTime] = useState(0); // seconds remaining
