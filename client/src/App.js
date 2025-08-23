@@ -263,6 +263,19 @@ function App() {
     });
     setAdminOrders(res.data);
   };
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    try {
+      await axios.delete(`${API}/admin/users/${userId}`, {
+        headers: { Authorization: user.token },
+      });
+      setAdminUsers((prev) => prev.filter((u) => u._id !== userId));
+      setSnackbar({ open: true, success: true, msg: "User deleted!" });
+    } catch (err) {
+      setSnackbar({ open: true, success: false, msg: "Failed to delete user" });
+    }
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
@@ -275,8 +288,6 @@ function App() {
       setAuthTab(0); // Switch to Login tab
       setRegisterOpen(false); // Close register dialog
       setLoginOpen(true); // Open login dialog
-
-      // Set login form email to registered email and clear password
       setLoginForm({ email: registerForm.email, password: "" });
 
       // Clear register form
@@ -620,6 +631,7 @@ function App() {
               onViewUser={handleViewUser}
               adminUserDetails={adminUserDetails}
               setAdminUserDetails={setAdminUserDetails}
+              onDeleteUser={handleDeleteUser}
             />
           )}
           {user && user.isAdmin && page === "admin_custom_requests" && (

@@ -413,6 +413,15 @@ app.delete("/api/team/:id", auth, admin, async (req, res) => {
   res.json({ success: true });
 });
 
+// Admin: delete user
+app.delete("/api/admin/users/:id", auth, admin, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+});
 // Admin: delete project
 app.delete("/api/admin/project/:id", auth, admin, async (req, res) => {
   await Project.findByIdAndDelete(req.params.id);

@@ -20,6 +20,21 @@ import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
+// Password strength checker function
+function getPasswordStrength(password) {
+  if (!password) return "";
+  if (password.length < 6) return "Weak";
+  if (
+    password.length >= 8 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /[0-9]/.test(password) &&
+    /[^A-Za-z0-9]/.test(password)
+  ) {
+    return "Strong";
+  }
+  return "Medium";
+}
 
 export default function AuthDialog({
   open,
@@ -41,6 +56,11 @@ export default function AuthDialog({
   isLockedOut,
   lockoutTime,
 }) {
+  // Password strength calculation (only for registration)
+  const passwordStrength = getPasswordStrength(registerForm.password);
+
+  const isPhoneInvalid = registerForm.phone && registerForm.phone.length !== 11;
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <Paper elevation={0} sx={{ p: 0, bgcolor: "transparent" }}>
@@ -156,8 +176,19 @@ export default function AuthDialog({
                 fullWidth
                 sx={{ mb: 2 }}
                 value={registerForm.phone}
-                onChange={(e) =>
-                  setRegisterForm((f) => ({ ...f, phone: e.target.value }))
+                type="tel"
+                inputProps={{
+                  maxLength: 11,
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setRegisterForm((f) => ({ ...f, phone: value }));
+                }}
+                error={isPhoneInvalid}
+                helperText={
+                  isPhoneInvalid ? "Phone number must be 11 digits" : ""
                 }
               />
               <TextField
@@ -195,7 +226,7 @@ export default function AuthDialog({
                 name="password"
                 type={showRegPassword ? "text" : "password"}
                 fullWidth
-                sx={{ mb: 2 }}
+                sx={{ mb: 1 }}
                 value={registerForm.password}
                 onChange={(e) =>
                   setRegisterForm((f) => ({ ...f, password: e.target.value }))
@@ -214,6 +245,25 @@ export default function AuthDialog({
                   ),
                 }}
               />
+              {/* Password strength indicator */}
+              {registerForm.password && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color:
+                      passwordStrength === "Strong"
+                        ? "green"
+                        : passwordStrength === "Medium"
+                        ? "orange"
+                        : "red",
+                    mb: 2,
+                    ml: 1,
+                    fontWeight: 600,
+                  }}
+                >
+                  Password is {passwordStrength}
+                </Typography>
+              )}
               <Button
                 type="submit"
                 variant="contained"
