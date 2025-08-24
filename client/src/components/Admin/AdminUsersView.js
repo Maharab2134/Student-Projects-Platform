@@ -74,14 +74,31 @@ export default function AdminUsersView({
       return;
     }
     setSending(true);
+
+    const deliveredOrder = adminUserDetails.orders.find(
+      (o) => o.status === "Delivery"
+    );
+
+    if (!deliveredOrder) {
+      setSnackbar({
+        open: true,
+        msg: "No Delivery/Completed order found for this user!",
+        success: false,
+      });
+      setSending(false);
+      return;
+    }
+
+    const project = deliveredOrder.projects[0];
+
     try {
       await axios.post(
         `${API}/admin/send-complete-mail`,
         {
           to: adminUserDetails.user.email,
           name: adminUserDetails.user.name,
-          order: adminUserDetails.orders[0],
-          downloadLink, // <-- পাঠানো হচ্ছে
+          order: deliveredOrder,
+          downloadLink,
         },
         {
           headers: { Authorization: adminToken },
@@ -347,7 +364,7 @@ export default function AdminUsersView({
                   <li key={o._id}>
                     <b>{o.projects.map((p) => p.title).join(", ")}</b>
                     {" - "}
-                    <span style={{ color: "#1976d2" }}>${o.total}</span>
+                    <span style={{ color: "#1976d2" }}>BDT {o.total}K</span>
                     {" - "}
                     <span
                       style={{
