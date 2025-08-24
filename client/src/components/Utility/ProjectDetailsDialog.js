@@ -612,12 +612,6 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
           </Box>
         </DialogContent>
       </Dialog>
-
-      <ScrollTop>
-        <Fab color="primary" size="small" aria-label="scroll back to top">
-          <ArrowBack sx={{ transform: "rotate(90deg)" }} />
-        </Fab>
-      </ScrollTop>
     </>
   );
 }

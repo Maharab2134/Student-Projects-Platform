@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -19,9 +19,14 @@ import {
   useMediaQuery,
   Paper,
   Tooltip,
+  Snackbar,
+  Alert,
+  TextField,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EmailIcon from "@mui/icons-material/Email";
+import axios from "axios";
 
 // Helper function to shorten institute name
 function shortInstituteName(name) {
@@ -39,9 +44,59 @@ export default function AdminUsersView({
   adminUserDetails,
   setAdminUserDetails,
   onDeleteUser,
+  adminToken,
+  API,
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [sending, setSending] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    msg: "",
+    success: true,
+  });
+  const [downloadLink, setDownloadLink] = useState("");
+
+  // Email send handler
+  const handleSendEmail = async () => {
+    if (
+      !adminUserDetails ||
+      !adminUserDetails.user ||
+      !adminUserDetails.orders.length
+    )
+      return;
+    if (!downloadLink) {
+      setSnackbar({
+        open: true,
+        msg: "Please provide a download link!",
+        success: false,
+      });
+      return;
+    }
+    setSending(true);
+    try {
+      await axios.post(
+        `${API}/admin/send-complete-mail`,
+        {
+          to: adminUserDetails.user.email,
+          name: adminUserDetails.user.name,
+          order: adminUserDetails.orders[0],
+          downloadLink, // <-- পাঠানো হচ্ছে
+        },
+        {
+          headers: { Authorization: adminToken },
+        }
+      );
+      setSnackbar({
+        open: true,
+        msg: "Email sent successfully!",
+        success: true,
+      });
+    } catch (err) {
+      setSnackbar({ open: true, msg: "Failed to send email!", success: false });
+    }
+    setSending(false);
+  };
 
   return (
     <Box>
@@ -183,7 +238,10 @@ export default function AdminUsersView({
       {/* User Details Dialog */}
       <Dialog
         open={!!adminUserDetails}
-        onClose={() => setAdminUserDetails(null)}
+        onClose={() => {
+          setAdminUserDetails(null);
+          setDownloadLink("");
+        }}
         maxWidth="xs"
         fullWidth
         PaperProps={{
@@ -207,9 +265,25 @@ export default function AdminUsersView({
                   <PersonIcon sx={{ fontSize: 32 }} />
                 </Avatar>
                 <Box>
-                  <Typography variant="h6" fontWeight={700}>
-                    {adminUserDetails.user.name}
-                  </Typography>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Typography variant="h6" fontWeight={700}>
+                      {adminUserDetails.user.name}
+                    </Typography>
+                    {/* Email Icon */}
+                    <Tooltip title="Send Completion Email">
+                      <span>
+                        <IconButton
+                          color="primary"
+                          size="small"
+                          onClick={handleSendEmail}
+                          disabled={sending}
+                          sx={{ ml: 1 }}
+                        >
+                          <EmailIcon />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                  </Stack>
                   <Typography variant="body2" color="text.secondary">
                     {adminUserDetails.user.email}
                   </Typography>
@@ -218,6 +292,15 @@ export default function AdminUsersView({
                   </Typography>
                 </Box>
               </Stack>
+              {/* Download Link Input */}
+              <TextField
+                label="Download Link"
+                value={downloadLink}
+                onChange={(e) => setDownloadLink(e.target.value)}
+                fullWidth
+                sx={{ mb: 2 }}
+                placeholder="https://your-link.com/file.zip"
+              />
               <Divider sx={{ mb: 2 }} />
               <Typography
                 variant="body2"
@@ -281,7 +364,10 @@ export default function AdminUsersView({
                 variant="contained"
                 color="primary"
                 sx={{ mt: 3, fontWeight: 700 }}
-                onClick={() => setAdminUserDetails(null)}
+                onClick={() => {
+                  setAdminUserDetails(null);
+                  setDownloadLink("");
+                }}
                 fullWidth
               >
                 Close
@@ -290,6 +376,22 @@ export default function AdminUsersView({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Snackbar for email status */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.success ? "success" : "error"}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.msg}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

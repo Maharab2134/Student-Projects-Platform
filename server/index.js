@@ -585,4 +585,99 @@ app.get("/api", (req, res) => {
   res.send("API is working!");
 });
 
+// Send email on project completion
+const nodemailer = require("nodemailer");
+
+app.post("/api/admin/send-complete-mail", auth, admin, async (req, res) => {
+  try {
+    const { to, name, order, downloadLink } = req.body;
+    if (!to || !name || !order) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+
+    // Project info
+    const project =
+      order.projects && order.projects[0] ? order.projects[0] : {};
+    const subject = `Your Project "${
+      project.title || "Project"
+    }" is Completed!`;
+
+    // Email body (text version)
+    const body = `Hello ${name},Thank you for placing an order with us. We’re excited to inform you that your project "
+    ${project.title || "Project"}" has been successfully completed.
+
+Project Details:
+- Type: ${project.category || "N/A"}
+- Order ID: ${order._id}
+- Delivery Date: ${new Date(order.createdAt).toLocaleDateString()}
+
+You can download your project files using the secure link below:
+${downloadLink || "[Download Link]"}
+
+If you have any questions, need modifications, or further assistance, feel free to reply to this email.
+We appreciate your trust in our service and look forward to working with you again.
+
+Best regards,
+Student Project Shop Team
+https://student-projects-platform.vercel.app/
+studentcrafted@gmail.com
+    `;
+
+    // (Optional) HTML version for better email formatting
+    const htmlBody = `
+      <p>Hello ${name},</p>
+      <p>Thank you for placing an order with us.<br>
+      We’re excited to inform you that your project <b>"${
+        project.title || "Project"
+      }"</b> has been successfully completed.</p>
+      <h4>Project Details:</h4>
+      <ul>
+        <li><b>Type:</b> ${project.category || "N/A"}</li>
+        <li><b>Order ID:</b> ${order._id}</li>
+        <li><b>Delivery Date:</b> ${new Date(
+          order.createdAt
+        ).toLocaleDateString()}</li>
+      </ul>
+      <p>
+        <b>You can download your project files using the secure link below:</b><br>
+        <a href="${downloadLink || "#"}" style="color:#1976d2;">${
+      downloadLink || "[Download Link]"
+    }</a>
+      </p>
+      <p>
+        If you have any questions, need modifications, or further assistance, feel free to reply to this email.<br>
+        We appreciate your trust in our service and look forward to working with you again.
+      </p>
+      <p>
+        Best regards,<br>
+        <b>Student Project Shop Team</b><br>
+        <a href="https://student-projects-platform.vercel.app/">student-projects-platform.vercel.app</a><br>
+        studentcrafted@gmail.com
+      </p>
+    `;
+
+    // Nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "studentcrafted@gmail.com",
+        pass: process.env.GMAIL_APP_PASSWORD, // .env ফাইলে রাখুন
+      },
+    });
+
+    // Send mail
+    await transporter.sendMail({
+      from: "studentcrafted@gmail.com",
+      to,
+      subject,
+      text: body,
+      html: htmlBody,
+    });
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error("Mail send error:", e);
+    res.status(500).json({ error: "Failed to send email" });
+  }
+});
 app.listen(5000, () => console.log("Server running on port 5000"));

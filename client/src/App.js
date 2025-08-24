@@ -632,6 +632,8 @@ function App() {
               adminUserDetails={adminUserDetails}
               setAdminUserDetails={setAdminUserDetails}
               onDeleteUser={handleDeleteUser}
+              adminToken={user.token}
+              API={API}
             />
           )}
           {user && user.isAdmin && page === "admin_custom_requests" && (
