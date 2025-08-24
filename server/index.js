@@ -6,9 +6,16 @@ const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://student-projects-platform.vercel.app",
+      "http://localhost:3000",
+    ],
+    credentials: true,
+  })
+);
 app.use(express.json());
-
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
