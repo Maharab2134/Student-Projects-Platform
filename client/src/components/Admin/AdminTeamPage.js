@@ -68,7 +68,6 @@ export default function AdminTeamPage({ user }) {
 
   useEffect(() => {
     fetchTeam();
-    // eslint-disable-next-line
   }, []);
 
   const handleOpen = (member = null) => {
