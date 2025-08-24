@@ -6,16 +6,9 @@ const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
 const app = express();
-app.use(
-  cors({
-    origin: [
-      "https://student-projects-platform.vercel.app",
-      "http://localhost:3000",
-    ],
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
+
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
@@ -592,9 +585,9 @@ app.get("/api", (req, res) => {
   res.send("API is working!");
 });
 
-// Send email on project completion
 const nodemailer = require("nodemailer");
 
+// API: Send project completion email to user (with download link)
 app.post("/api/admin/send-complete-mail", auth, admin, async (req, res) => {
   try {
     const { to, name, order, downloadLink } = req.body;
@@ -610,8 +603,13 @@ app.post("/api/admin/send-complete-mail", auth, admin, async (req, res) => {
     }" is Completed!`;
 
     // Email body (text version)
-    const body = `Hello ${name},Thank you for placing an order with us. We’re excited to inform you that your project "
-    ${project.title || "Project"}" has been successfully completed.
+    const body = `
+Hello ${name},
+
+Thank you for placing an order with us.
+We’re excited to inform you that your project "${
+      project.title || "Project"
+    }" has been successfully completed.
 
 Project Details:
 - Type: ${project.category || "N/A"}
@@ -668,7 +666,7 @@ studentcrafted@gmail.com
       service: "gmail",
       auth: {
         user: "studentcrafted@gmail.com",
-        pass: process.env.GMAIL_APP_PASSWORD, // .env ফাইলে রাখুন
+        pass: process.env.GMAIL_APP_PASSWORD,
       },
     });
 
@@ -678,7 +676,7 @@ studentcrafted@gmail.com
       to,
       subject,
       text: body,
-      html: htmlBody,
+      html: htmlBody, // <-- HTML version
     });
 
     res.json({ success: true });
