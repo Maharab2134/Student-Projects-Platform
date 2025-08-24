@@ -602,14 +602,13 @@ app.post("/api/admin/send-complete-mail", auth, admin, async (req, res) => {
       project.title || "Project"
     }" is Completed!`;
 
-    // Email body (text version)
     const body = `
-Hello ${name},
+👋 Hello ${name},
 
-Thank you for placing an order with us.
+Thank you for placing an order with us!
 We’re excited to inform you that your project "${
       project.title || "Project"
-    }" has been successfully completed.
+    }" has been successfully completed. 🎉
 
 Project Details:
 - Type: ${project.category || "N/A"}
@@ -623,43 +622,55 @@ If you have any questions, need modifications, or further assistance, feel free 
 We appreciate your trust in our service and look forward to working with you again.
 
 Best regards,
-Student Project Shop Team
-https://student-projects-platform.vercel.app/
+🚀 Student Project Shop Team
 studentcrafted@gmail.com
-    `;
+`;
 
-    // (Optional) HTML version for better email formatting
+    // Optional: HTML version for email clients that support rich formatting
     const htmlBody = `
-      <p>Hello ${name},</p>
-      <p>Thank you for placing an order with us.<br>
-      We’re excited to inform you that your project <b>"${
-        project.title || "Project"
-      }"</b> has been successfully completed.</p>
-      <h4>Project Details:</h4>
-      <ul>
-        <li><b>Type:</b> ${project.category || "N/A"}</li>
-        <li><b>Order ID:</b> ${order._id}</li>
-        <li><b>Delivery Date:</b> ${new Date(
-          order.createdAt
-        ).toLocaleDateString()}</li>
-      </ul>
-      <p>
-        <b>You can download your project files using the secure link below:</b><br>
-        <a href="${downloadLink || "#"}" style="color:#1976d2;">${
-      downloadLink || "[Download Link]"
-    }</a>
-      </p>
-      <p>
-        If you have any questions, need modifications, or further assistance, feel free to reply to this email.<br>
-        We appreciate your trust in our service and look forward to working with you again.
-      </p>
-      <p>
-        Best regards,<br>
-        <b>Student Project Shop Team</b><br>
-        <a href="https://student-projects-platform.vercel.app/">student-projects-platform.vercel.app</a><br>
-        studentcrafted@gmail.com
-      </p>
-    `;
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Project Delivery - Student Project Shop</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+  <p>👋 Hello <b>${name}</b>,</p>
+  <p>
+    Thank you for placing an order with us!<br>
+    We’re excited to inform you that your project <b>"${
+      project.title || "Project"
+    }"</b> has been successfully completed. 🎉
+  </p>
+  <h3 style="color:#1976d2;">📄 Project Details</h3>
+  <ul style="padding-left:18px;">
+    <li><b>Type:</b> ${project.category || "N/A"}</li>
+    <li><b>Order ID:</b> ${order._id}</li>
+    <li><b>Delivery Date:</b> ${new Date(
+      order.createdAt
+    ).toLocaleDateString()}</li>
+  </ul>
+  <p>
+    <b>⬇ You can download your project files using the secure link below:</b><br>
+    <a href="${downloadLink || "#"}" 
+       style="display:inline-block; margin-top:8px; padding:10px 16px; background-color:#1976d2; color:#ffffff; text-decoration:none; border-radius:4px;">
+       🔗 Download Project Files
+    </a>
+  </p>
+  <p>
+    If you have any questions, need modifications, or further assistance, feel free to reply to this email.<br>
+    We appreciate your trust in our service and look forward to working with you again.
+  </p>
+  <p>
+    Best regards,<br>
+    🚀 <b>Student Project Shop Team</b><br>
+    studentcrafted@gmail.com
+  </p>
+  <hr style="margin-top:30px; border:none; border-top:1px solid #ddd;">
+  <p style="font-size:13px; color:#888;">&copy; ${new Date().getFullYear()} Student Project Shop. All rights reserved.</p>
+</body>
+</html>
+`;
 
     // Nodemailer transporter
     const transporter = nodemailer.createTransport({
