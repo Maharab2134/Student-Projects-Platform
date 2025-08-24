@@ -89,12 +89,14 @@ const CustomRequest = mongoose.model(
   })
 );
 
+// TeamMember schema with order field
 const TeamMember = mongoose.model(
   "TeamMember",
   new mongoose.Schema({
     name: { type: String, required: true },
     role: { type: String, required: true },
     img: { type: String, required: true },
+    order: { type: Number, default: 0 }, // <-- for ordering
   })
 );
 
@@ -351,9 +353,9 @@ app.get("/api/project/:id", async (req, res) => {
   res.json(project);
 });
 
-// Get all team members
+// Get all team members, sorted by order
 app.get("/api/team", async (req, res) => {
-  const team = await TeamMember.find();
+  const team = await TeamMember.find().sort({ order: 1 });
   res.json(team);
 });
 
@@ -374,11 +376,12 @@ app.post("/api/admin/project", auth, admin, async (req, res) => {
   res.json({ success: true });
 });
 
-// Admin: Add team member
+// Admin: Add team member (set order to end)
 app.post("/api/team", auth, admin, async (req, res) => {
   const { name, role, img } = req.body;
   if (!name || !role || !img) return res.status(400).send("Missing fields");
-  await TeamMember.create({ name, role, img });
+  const count = await TeamMember.countDocuments();
+  await TeamMember.create({ name, role, img, order: count });
   res.json({ success: true });
 });
 
@@ -387,6 +390,16 @@ app.put("/api/team/:id", auth, admin, async (req, res) => {
   const { name, role, img } = req.body;
   if (!name || !role || !img) return res.status(400).send("Missing fields");
   await TeamMember.findByIdAndUpdate(req.params.id, { name, role, img });
+  res.json({ success: true });
+});
+
+// Admin: Reorder team members
+app.post("/api/team/reorder", auth, admin, async (req, res) => {
+  const { order } = req.body; // order: [id1, id2, ...]
+  if (!Array.isArray(order)) return res.status(400).send("Invalid order array");
+  for (let i = 0; i < order.length; i++) {
+    await TeamMember.findByIdAndUpdate(order[i], { order: i });
+  }
   res.json({ success: true });
 });
 
@@ -687,7 +700,7 @@ studentcrafted@gmail.com
       to,
       subject,
       text: body,
-      html: htmlBody, // <-- HTML version
+      html: htmlBody, 
     });
 
     res.json({ success: true });
@@ -696,4 +709,5 @@ studentcrafted@gmail.com
     res.status(500).json({ error: "Failed to send email" });
   }
 });
+
 app.listen(5000, () => console.log("Server running on port 5000"));

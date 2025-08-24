@@ -21,13 +21,12 @@ import {
   Stack,
   Avatar,
 } from "@mui/material";
-import { Add, Edit, Delete } from "@mui/icons-material";
+import { Add, Edit, Delete, DragIndicator } from "@mui/icons-material";
 import Autocomplete from "@mui/material/Autocomplete";
 import axios from "axios";
 
-const API = process.env.REACT_APP_API; // Ensure this is set in your .env file
+const API = process.env.REACT_APP_API;
 
-// Suggested roles
 const roleOptions = [
   "Founder & CEO",
   "Backend Developer",
@@ -56,12 +55,12 @@ export default function AdminTeamPage({ user }) {
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState({ name: "", role: "", img: "" });
-
   const [snackbar, setSnackbar] = useState({
     open: false,
     msg: "",
     success: true,
   });
+  const [draggedIdx, setDraggedIdx] = useState(null);
 
   const fetchTeam = () => {
     axios.get(`${API}/team`).then((res) => setTeam(res.data));
@@ -69,6 +68,7 @@ export default function AdminTeamPage({ user }) {
 
   useEffect(() => {
     fetchTeam();
+    // eslint-disable-next-line
   }, []);
 
   const handleOpen = (member = null) => {
@@ -140,6 +140,34 @@ export default function AdminTeamPage({ user }) {
     }
   };
 
+  // HTML5 Drag and Drop Handlers
+  const handleDragStart = (idx) => setDraggedIdx(idx);
+
+  const handleDragOver = (e) => e.preventDefault();
+
+  const handleDrop = (idx) => {
+    if (draggedIdx === null || draggedIdx === idx) return;
+    const newTeam = [...team];
+    const [removed] = newTeam.splice(draggedIdx, 1);
+    newTeam.splice(idx, 0, removed);
+    setTeam(newTeam);
+    setDraggedIdx(null);
+  };
+
+  const handleSaveOrder = async () => {
+    try {
+      await axios.post(
+        `${API}/team/reorder`,
+        { order: team.map((m) => m._id) },
+        { headers: { Authorization: user.token } }
+      );
+      setSnackbar({ open: true, msg: "Order saved!", success: true });
+      fetchTeam();
+    } catch {
+      setSnackbar({ open: true, msg: "Failed to save order.", success: false });
+    }
+  };
+
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto", py: 4, px: 2 }}>
       <Stack
@@ -160,10 +188,20 @@ export default function AdminTeamPage({ user }) {
         </Button>
       </Stack>
 
+      <Button
+        variant="outlined"
+        sx={{ my: 2 }}
+        onClick={handleSaveOrder}
+        disabled={team.length < 2}
+      >
+        Save Order
+      </Button>
+
       <TableContainer component={Paper} sx={{ borderRadius: 1, boxShadow: 3 }}>
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell />
               <TableCell sx={{ fontWeight: 700 }}>Photo</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Name</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Role</TableCell>
@@ -173,8 +211,22 @@ export default function AdminTeamPage({ user }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {team.map((member) => (
-              <TableRow key={member._id} hover>
+            {team.map((member, idx) => (
+              <TableRow
+                key={member._id}
+                draggable
+                onDragStart={() => handleDragStart(idx)}
+                onDragOver={handleDragOver}
+                onDrop={() => handleDrop(idx)}
+                style={{
+                  background: draggedIdx === idx ? "#f0f0f0" : "inherit",
+                  cursor: "move",
+                }}
+                hover
+              >
+                <TableCell sx={{ cursor: "grab", width: 40 }}>
+                  <DragIndicator />
+                </TableCell>
                 <TableCell>
                   <Avatar
                     src={member.img}
