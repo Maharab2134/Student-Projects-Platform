@@ -700,7 +700,7 @@ studentcrafted@gmail.com
       to,
       subject,
       text: body,
-      html: htmlBody, 
+      html: htmlBody,
     });
 
     res.json({ success: true });

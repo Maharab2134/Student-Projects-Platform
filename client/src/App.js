@@ -96,6 +96,7 @@ function App() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRegPassword, setShowRegPassword] = useState(false);
   const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem("cart");
     return saved ? JSON.parse(saved) : [];
@@ -164,7 +165,11 @@ function App() {
     }
   }, [user]);
   useEffect(() => {
-    axios.get(`${API}/projects`).then((res) => setProjects(res.data));
+    setLoadingProjects(true);
+    axios
+      .get(`${API}/projects`)
+      .then((res) => setProjects(res.data))
+      .finally(() => setLoadingProjects(false));
   }, []);
   useEffect(() => {
     if (user && user.isAdmin) {
@@ -550,6 +555,7 @@ function App() {
                   projectRatings={projectRatings}
                   setSelectedProject={setSelectedProject} // Pass this down
                   setProjectDialogOpen={setProjectDialogOpen}
+                  loading={loadingProjects}
                 />
 
                 <ProjectDetailsDialog
