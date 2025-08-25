@@ -67,7 +67,13 @@ function App() {
   // State
   const [user, setUser] = useState(() => {
     const token = localStorage.getItem("token");
-    if (!token) return null;
+    const expiry = localStorage.getItem("token_expiry");
+    if (!token || !expiry) return null;
+    if (Date.now() > Number(expiry)) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("token_expiry");
+      return null;
+    }
     try {
       const decoded = jwtDecode(token);
       return { ...decoded, token };
@@ -211,8 +217,10 @@ function App() {
     try {
       const res = await axios.post(`${API}/login`, loginForm);
       const decoded = jwtDecode(res.data.token);
+      const expiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
       setUser({ ...decoded, token: res.data.token });
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("token_expiry", expiry); // ঠিক নাম
       setLoginOpen(false);
       setSnackbar({ open: true, success: true, msg: "Logged in!" });
 
@@ -312,8 +320,8 @@ function App() {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("token_expiry");
     setCart([]);
-    localStorage.removeItem("cart");
     setMyOrders([]);
     setAdminOrders([]);
     setAdminUsers([]);
@@ -336,9 +344,11 @@ function App() {
   const addToCart = (project) => {
     if (cart.find((p) => p._id === project._id)) return;
     setCart([...cart, project]);
+    localStorage.setItem("cart", JSON.stringify([...cart, project]));
     setSnackbar({ open: true, success: true, msg: "Added to cart!" });
   };
   const removeFromCart = (id) => setCart(cart.filter((p) => p._id !== id));
+
   const handleBuy = async (transactionId) => {
     if (!user) {
       setSnackbar({ open: true, success: false, msg: "Login to buy" });
