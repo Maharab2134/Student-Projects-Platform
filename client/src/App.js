@@ -347,8 +347,11 @@ function App() {
     localStorage.setItem("cart", JSON.stringify([...cart, project]));
     setSnackbar({ open: true, success: true, msg: "Added to cart!" });
   };
-  const removeFromCart = (id) => setCart(cart.filter((p) => p._id !== id));
-
+  const removeFromCart = (id) => {
+    const updatedCart = cart.filter((p) => p._id !== id);
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
   const handleBuy = async (transactionId) => {
     if (!user) {
       setSnackbar({ open: true, success: false, msg: "Login to buy" });
