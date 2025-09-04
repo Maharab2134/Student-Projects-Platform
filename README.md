@@ -21,25 +21,45 @@ Student Projects Platform is a full-stack web application that connects students
 - **Other:** Nodemailer, dotenv, cors
 
 ## Folder Structure
+
 ```
 student-projects-platform/
-├── client/           # React frontend
-│   ├── public/
-│   └── src/
-│       ├── components/
-│       │   ├── Admin/         # Admin dashboard views
-│       │   ├── Auth/          # Authentication dialogs
-│       │   ├── Pages/         # Main user pages (cart, orders, profile, etc.)
-│       │   ├── ULink/         # About, legal, privacy, refund, terms
-│       │   └── Utility/       # Navbar, footer, grid, etc.
-│       ├── App.js
-│       └── index.js
-├── server/           # Node.js backend
-│   ├── index.js      # Main server file
-│   └── package.json
-├── package.json      # Project scripts and dependencies
-└── README.md
+├── client/                  # React frontend (handles all user interface)
+│   ├── public/              # Static files (index.html, icons, manifest, etc.)
+│   └── src/                 # Main React source code
+│       ├── components/      # Reusable React components
+│       │   ├── Admin/       # Admin dashboard views (manage users, products, orders, custom requests)
+│       │   ├── Auth/        # Authentication dialogs (login, register, etc.)
+│       │   ├── Pages/       # Main user pages (cart, orders, profile, success stories, etc.)
+│       │   ├── ULink/       # About, legal, privacy, refund, terms pages
+│       │   └── Utility/     # Shared UI elements (Navbar, Footer, ProjectGrid, etc.)
+│       ├── App.js           # Main React app component (routing, layout)
+│       └── index.js         # Entry point for React app
+├── server/                  # Node.js backend (API, business logic)
+│   ├── index.js             # Main server file (Express app, API routes)
+│   └── package.json         # Backend dependencies and scripts
+├── package.json             # Root project scripts, dependencies, and dev tools (concurrently, shared libs)
+└── README.md                # Project documentation
 ```
+
+### Folder Structure Analysis
+
+- **client/**: Contains the entire frontend built with React. All user-facing features, UI, and client-side logic live here.
+	- **public/**: Static assets served directly (HTML, icons, manifest, etc.).
+	- **src/**: All React source code.
+		- **components/**: Organized by feature:
+			- **Admin/**: Admin dashboard views (user, product, order, custom request management).
+			- **Auth/**: Authentication dialogs (login, registration, etc.).
+			- **Pages/**: Main user pages (cart, orders, profile, success stories, etc.).
+			- **ULink/**: Informational/legal pages (about, privacy, refund, terms).
+			- **Utility/**: Shared UI elements (Navbar, Footer, ProjectGrid, etc.).
+		- **App.js**: Main app component, sets up routes and layout.
+		- **index.js**: Entry point for React app.
+- **server/**: Node.js backend. Handles API, authentication, database, and business logic.
+	- **index.js**: Main Express server file, sets up routes and middleware.
+	- **package.json**: Backend dependencies and scripts.
+- **package.json**: Root-level scripts (start, build, test), shared dependencies, and dev tools (e.g., concurrently).
+- **README.md**: Project documentation, setup, and usage instructions.
 
 ## Getting Started
 

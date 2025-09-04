@@ -33,14 +33,7 @@ const CATEGORIES = ["Web", "App", "ML"];
 const CATEGORIZED_LANGUAGES = [
   {
     category: "App Development",
-    languages: [
-      "Java",
-      "Kotlin",
-      "Swift",
-      "Flutter",
-      "React Native",
-      "PHP (Api)",
-    ],
+    languages: ["Java", "Kotlin", "Swift", "Flutter", "React Native"],
   },
   {
     category: "Web Development",
