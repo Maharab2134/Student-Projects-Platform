@@ -7,10 +7,20 @@ import {
   Tooltip,
   Stack,
   Skeleton,
+  Card,
+  CardContent,
+  CardMedia,
+  CardActions,
+  IconButton,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import { motion } from "framer-motion";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { motion, AnimatePresence } from "framer-motion";
 import Rating from "@mui/material/Rating";
+import ReactMarkdown from "react-markdown";
 
 export default function ProjectGrid({
   projects,
@@ -22,10 +32,12 @@ export default function ProjectGrid({
   projectRatings,
   setSelectedProject,
   setProjectDialogOpen,
-  loading, // <-- pass this prop from parent
+  loading,
 }) {
   const [expandedDesc, setExpandedDesc] = useState(null);
-  const [expandedTitle, setExpandedTitle] = useState(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const filtered = projects.filter(
     (p) =>
@@ -35,253 +47,210 @@ export default function ProjectGrid({
         (p.desc && p.desc.toLowerCase().includes(search.toLowerCase())))
   );
 
-  // Function to check if title needs truncation
-  const needsTruncation = (title) => {
-    if (!title) return false;
-    const wordCount = title.split(/\s+/).length;
-    return wordCount > 4 || title.length > 26;
+  const getGridColumns = () => {
+    if (isMobile) return "1fr";
+    if (isTablet) return "1fr 1fr";
+    return "1fr 1fr 1fr 1fr";
   };
 
   return (
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: {
-          xs: "1fr",
-          sm: "1fr 1fr",
-          md: "1fr 1fr 1fr",
-          lg: "1fr 1fr 1fr 1fr",
-        },
-        gap: 4,
-        px: { xs: 1.5, sm: 3, md: 5 },
+        gridTemplateColumns: getGridColumns(),
+        gap: 3,
+        px: { xs: 2, sm: 3, md: 4 },
         py: 2,
       }}
     >
       {loading ? (
-        // Show 4 skeleton cards while loading
-        Array.from({ length: 4 }).map((_, i) => (
-          <Box key={i} sx={{ height: 420 }}>
+        Array.from({ length: 8 }).map((_, i) => (
+          <Card
+            key={i}
+            sx={{ height: 420, borderRadius: 2, boxShadow: "none" }}
+          >
             <Skeleton
               variant="rectangular"
               height={180}
-              sx={{ mb: 2, borderRadius: 2 }}
+              sx={{ borderRadius: "12px 12px 0 0" }}
             />
-            <Skeleton variant="text" width="80%" />
-            <Skeleton variant="text" width="60%" />
-            <Skeleton variant="text" width="40%" />
-            <Skeleton
-              variant="rectangular"
-              height={40}
-              sx={{ mt: 2, borderRadius: 2 }}
-            />
-          </Box>
+            <CardContent sx={{ p: 2.5 }}>
+              <Skeleton variant="text" width="80%" height={28} />
+              <Skeleton variant="text" width="60%" height={24} />
+              <Skeleton variant="text" width="40%" height={20} />
+              <Box sx={{ display: "flex", gap: 1, mt: 1.5 }}>
+                <Skeleton variant="rounded" width={60} height={24} />
+                <Skeleton variant="rounded" width={60} height={24} />
+              </Box>
+              <Skeleton
+                variant="rectangular"
+                height={40}
+                sx={{ mt: 2.5, borderRadius: 2 }}
+              />
+            </CardContent>
+          </Card>
         ))
       ) : filtered.length === 0 ? (
-        <Typography
+        <Box
           sx={{
             gridColumn: "1/-1",
             textAlign: "center",
-            color: "text.secondary",
-            mt: 4,
+            py: 8,
+            px: 2,
           }}
         >
-          No projects found.
-        </Typography>
+          <Typography
+            variant="h5"
+            sx={{
+              color: "text.secondary",
+              mb: 2,
+              fontWeight: 500,
+            }}
+          >
+            No projects found
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+              maxWidth: 500,
+              margin: "0 auto",
+            }}
+          >
+            Try adjusting your search or filter criteria to find what you're
+            looking for.
+          </Typography>
+        </Box>
       ) : (
         filtered.map((project, i) => {
-          const shouldTruncateTitle = needsTruncation(project.title);
+          const ratingData = projectRatings.find(
+            (r) => r.projectId === project._id
+          );
+          const averageRating = ratingData?.averageRating || 0;
+          const ratingCount = ratingData?.ratingCount || 0;
 
           return (
             <motion.div
               key={project._id}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              whileHover={{ scale: 1.03 }}
-              style={{ width: "100%", cursor: "pointer" }}
-              onClick={() => {
-                setSelectedProject(project);
-                setProjectDialogOpen(true);
-              }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: i * 0.05 }}
+              whileHover={{ y: -5 }}
+              style={{ height: "100%" }}
             >
-              <Box
+              <Card
                 sx={{
-                  borderRadius: 1,
-                  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.08)",
-                  overflow: "hidden",
+                  height: "100%",
                   display: "flex",
                   flexDirection: "column",
-                  height: 420,
-                  position: "relative",
-                  transition: "0.3s ease",
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  boxShadow: "0 4px 24px rgba(0, 0, 0, 0.05)",
+                  transition: "all 0.3s ease-in-out",
                   "&:hover": {
-                    boxShadow: "0 10px 28px rgba(0, 0, 0, 0.12)",
+                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
                   },
                 }}
               >
-                {/* Image */}
-                <Box
-                  sx={{
-                    position: "relative",
-                    overflow: "hidden",
-                    height: 180,
-                    "&:hover img": {
-                      transform: "scale(1.06)",
-                    },
-                  }}
-                >
-                  <img
-                    src={project.img}
+                {/* Image with overlay */}
+                <Box sx={{ position: "relative" }}>
+                  <CardMedia
+                    component="img"
+                    height="180"
+                    image={project.img}
                     alt={project.title}
-                    style={{
-                      width: "100%",
-                      height: "100%",
+                    sx={{
                       objectFit: "cover",
-                      transition: "transform 0.4s ease",
+                      transition: "transform 0.5s ease",
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                      },
                     }}
                   />
-                  <Chip
-                    label={`BDT ${project.price}K`}
+                  <Box
                     sx={{
                       position: "absolute",
-                      top: 8,
-                      right: 8,
-                      fontWeight: 700,
-                      fontSize: 15,
-                      px: 1.5,
-                      py: 0.3,
-                      bgcolor: "#ffffff",
-                      color: "#388e3c",
-                      boxShadow: 1,
-                      borderRadius: 2,
+                      top: 12,
+                      right: 12,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-end",
+                      gap: 1,
                     }}
-                  />
+                  >
+                    <Chip
+                      label={`BDT ${project.price}K`}
+                      sx={{
+                        fontWeight: 700,
+                        backgroundColor: "rgba(255, 255, 255, 0.92)",
+                        color: "#388e3c",
+                        backdropFilter: "blur(4px)",
+                        boxShadow: "0 2px 12px rgba(0, 0, 0, 0.1)",
+                        borderRadius: 2,
+                      }}
+                    />
+                  </Box>
                 </Box>
 
-                {/* Content */}
-                <Box
-                  sx={{
-                    p: 2.2,
-                    flexGrow: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    maxWidth: "100%",
-                  }}
-                >
-                  {/* Title with expand/collapse functionality */}
+                <CardContent sx={{ p: 2.5, flexGrow: 1, pb: 1 }}>
+                  {/* Title */}
                   <Typography
                     variant="h6"
                     sx={{
                       fontWeight: 700,
-                      color: "#1976d2",
+                      color: "text.primary",
                       fontSize: 18,
-                      mb: 0.8,
+                      mb: 1,
                       overflow: "hidden",
-                      whiteSpace:
-                        expandedTitle === project._id ? "normal" : "nowrap",
                       textOverflow: "ellipsis",
-                      width: "100%",
-                      cursor: shouldTruncateTitle ? "pointer" : "default",
-                      maxHeight:
-                        expandedTitle === project._id ? "none" : "1.5em",
-                      lineHeight: "1.5em",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent card click
-                      if (shouldTruncateTitle) {
-                        setExpandedTitle(
-                          expandedTitle === project._id ? null : project._id
-                        );
-                      }
-                    }}
-                  >
-                    {expandedTitle === project._id
-                      ? project.title
-                      : shouldTruncateTitle
-                      ? project.title.slice(0, 26) + " ..."
-                      : project.title}
-                    {shouldTruncateTitle && (
-                      <span
-                        style={{
-                          color: "#1976d2",
-                          marginLeft: 4,
-                          fontWeight: 600,
-                          fontSize: "0.9em",
-                        }}
-                      >
-                        {expandedTitle === project._id ? "..." : ""}
-                      </span>
-                    )}
-                  </Typography>
-
-                  {/* Expand/Collapse Description */}
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: (theme) =>
-                        theme.palette.mode === "dark" ? "#fff" : "#333",
-                      minHeight: 44,
-                      maxHeight: expandedDesc === project._id ? "none" : 44,
-                      overflow:
-                        expandedDesc === project._id ? "visible" : "hidden",
                       display: "-webkit-box",
-                      WebkitLineClamp:
-                        expandedDesc === project._id ? "unset" : 2,
+                      WebkitLineClamp: 2,
                       WebkitBoxOrient: "vertical",
-                      mb: 1.5,
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                      wordBreak: "break-word",
-                      width: "100%",
-                      textAlign: "justify",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent card click
-                      setExpandedDesc(
-                        expandedDesc === project._id ? null : project._id
-                      );
+                      minHeight: "3.2rem",
                     }}
                   >
-                    {expandedDesc === project._id
-                      ? project.desc
-                      : project.desc.length > 90
-                      ? project.desc.slice(0, 90) + "..."
-                      : project.desc}
-                    {project.desc.length > 90 && (
-                      <span
-                        style={{
-                          color: "#1976d2",
-                          marginLeft: 4,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {expandedDesc === project._id
-                          ? " Show less"
-                          : " Read more"}
-                      </span>
-                    )}
+                    {project.title}
                   </Typography>
 
-                  {/* Category and Language */}
+                  {/* Description with expand functionality */}
+                  <Box sx={{ mb: 2 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "text.secondary",
+                        lineHeight: 1.5,
+                        overflow: "hidden",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      <ReactMarkdown>
+                        {expandedDesc === project._id
+                          ? project.desc
+                          : project.desc.length > 120
+                          ? `${project.desc.substring(0, 120)}...`
+                          : project.desc}
+                      </ReactMarkdown>
+                    </Typography>
+                  </Box>
+
+                  {/* Category & Language chips */}
                   <Stack
                     direction="row"
                     spacing={1}
-                    rowGap={1.4}
-                    sx={{
-                      mb: 1.5,
-                      flexWrap: "wrap",
-                      width: "100%",
-                      alignItems: "center",
-                    }}
+                    gap={1}
+                    sx={{ mb: 2, flexWrap: "wrap" }}
                   >
                     <Chip
                       label={project.category}
                       size="small"
                       sx={{
                         fontSize: 12,
-                        bgcolor: "#e3f2fd",
-                        color: "#1976d2",
+                        backgroundColor: "primary.light",
+                        color: "primary.contrastText",
                         fontWeight: 600,
+                        mb: 1,
                       }}
                     />
                     {(project.language || []).map((lang, idx) => (
@@ -291,9 +260,10 @@ export default function ProjectGrid({
                         size="small"
                         sx={{
                           fontSize: 12,
-                          bgcolor: "#ede7f6",
-                          color: "#6a1b9a",
+                          backgroundColor: "secondary.light",
+                          color: "secondary.contrastText",
                           fontWeight: 600,
+                          mb: 1,
                         }}
                       />
                     ))}
@@ -369,43 +339,64 @@ export default function ProjectGrid({
                   </Box>
 
                   <Box sx={{ flexGrow: 1 }} />
+                </CardContent>
 
-                  {/* Add to Cart Button (not for admin) */}
+                <CardActions sx={{ p: 2.5, pt: 0 }}>
                   {!user?.isAdmin && (
                     <Tooltip
                       title={
-                        user ? "Add this project to your cart" : "Login to buy"
+                        user
+                          ? "Add this project to your cart"
+                          : "Login to purchase"
                       }
                     >
                       <Button
                         variant="contained"
                         color="primary"
                         startIcon={<AddShoppingCartIcon />}
+                        fullWidth
                         sx={{
                           borderRadius: 2,
-                          fontWeight: 700,
-                          py: 1.1,
-                          fontSize: 15,
+                          fontWeight: 600,
+                          py: 1,
                           textTransform: "none",
                           boxShadow: "none",
-                          transition: "0.2s ease",
                           "&:hover": {
-                            background: "#1565c0",
+                            boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
                           },
                         }}
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent card click
+                          e.stopPropagation();
                           user ? addToCart(project) : openLogin();
                         }}
-                        component={motion.button}
-                        whileTap={{ scale: 0.96 }}
+                        component={motion.div}
+                        whileTap={{ scale: 0.97 }}
                       >
                         {user ? "Add to Cart" : "Login to Buy"}
                       </Button>
                     </Tooltip>
                   )}
-                </Box>
-              </Box>
+                  <Tooltip title="View project details">
+                    <IconButton
+                      color="primary"
+                      sx={{
+                        ml: 1,
+                        backgroundColor: "action.hover",
+                        "&:hover": {
+                          backgroundColor: "primary.main",
+                          color: "primary.contrastText",
+                        },
+                      }}
+                      onClick={() => {
+                        setSelectedProject(project);
+                        setProjectDialogOpen(true);
+                      }}
+                    >
+                      <VisibilityIcon />
+                    </IconButton>
+                  </Tooltip>
+                </CardActions>
+              </Card>
             </motion.div>
           );
         })
