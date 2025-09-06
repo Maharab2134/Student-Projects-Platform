@@ -58,7 +58,7 @@ export default function ProjectGrid({
       sx={{
         display: "grid",
         gridTemplateColumns: getGridColumns(),
-        gap: 3,
+        gap: 4,
         px: { xs: 2, sm: 3, md: 4 },
         py: 2,
       }}
@@ -67,7 +67,7 @@ export default function ProjectGrid({
         Array.from({ length: 8 }).map((_, i) => (
           <Card
             key={i}
-            sx={{ height: 420, borderRadius: 2, boxShadow: "none" }}
+            sx={{ height: 420, borderRadius: 1, boxShadow: "none" }}
           >
             <Skeleton
               variant="rectangular"
@@ -143,7 +143,7 @@ export default function ProjectGrid({
                   height: "100%",
                   display: "flex",
                   flexDirection: "column",
-                  borderRadius: 2,
+                  borderRadius: 1,
                   overflow: "hidden",
                   boxShadow: "0 4px 24px rgba(0, 0, 0, 0.05)",
                   transition: "all 0.3s ease-in-out",
@@ -192,7 +192,7 @@ export default function ProjectGrid({
                   </Box>
                 </Box>
 
-                <CardContent sx={{ p: 2.5, flexGrow: 1, pb: 1 }}>
+                <CardContent sx={{ p: 2, flexGrow: 1, pb: 1 }}>
                   {/* Title */}
                   <Typography
                     variant="h6"
@@ -213,7 +213,7 @@ export default function ProjectGrid({
                   </Typography>
 
                   {/* Description with expand functionality */}
-                  <Box sx={{ mb: 2 }}>
+                  <Box sx={{ mb: 1 }}>
                     <Typography
                       variant="body2"
                       sx={{

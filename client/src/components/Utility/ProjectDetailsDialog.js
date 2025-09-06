@@ -64,37 +64,6 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
-function ScrollTop({ children }) {
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 100,
-  });
-
-  const handleClick = (event) => {
-    const anchor = (event.target.ownerDocument || document).querySelector(
-      "#back-to-top-anchor"
-    );
-    if (anchor) {
-      anchor.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-  };
-
-  return (
-    <Zoom in={trigger}>
-      <Box
-        onClick={handleClick}
-        role="presentation"
-        sx={{ position: "fixed", bottom: 16, right: 16 }}
-      >
-        {children}
-      </Box>
-    </Zoom>
-  );
-}
-
 function TabPanel({ children, value, index, ...other }) {
   return (
     <Slide direction="up" in={value === index} mountOnEnter unmountOnExit>
@@ -170,7 +139,6 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
       TransitionComponent={Fade}
       transitionDuration={400}
     >
-      <div id="back-to-top-anchor" />
       <DialogTitle
         sx={{
           pb: 1,
@@ -241,7 +209,7 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
               <Box
                 sx={{
                   position: "relative",
-                  borderRadius: 3,
+                  borderRadius: 2,
                   overflow: "hidden",
                   boxShadow:
                     "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
@@ -495,7 +463,7 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
                       sx={{
                         flex: 1,
                         minWidth: isMobile ? "100%" : 140,
-                        borderRadius: 3,
+                        borderRadius: 2,
                         transition: "all 0.3s ease",
                         background:
                           "linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)",
@@ -528,7 +496,7 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
                           <LinearProgress
                             variant="determinate"
                             value={98}
-                            sx={{ flexGrow: 1, height: 8, borderRadius: 4 }}
+                            sx={{ flexGrow: 1, height: 8, borderRadius: 2 }}
                             color="primary"
                           />
                         </Box>
@@ -540,7 +508,7 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
                       sx={{
                         flex: 1,
                         minWidth: isMobile ? "calc(50% - 8px)" : 140,
-                        borderRadius: 3,
+                        borderRadius: 2,
                         transition: "all 0.3s ease",
                         background:
                           "linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%)",
@@ -577,7 +545,7 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
                       sx={{
                         flex: 1,
                         minWidth: isMobile ? "calc(50% - 8px)" : 140,
-                        borderRadius: 3,
+                        borderRadius: 2,
                         transition: "all 0.3s ease",
                         background:
                           "linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(46, 125, 50, 0.1) 100%)",
@@ -684,7 +652,7 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
                       <Card
                         variant="outlined"
                         sx={{
-                          borderRadius: 3,
+                          borderRadius: 2,
                           transition: "all 0.3s ease",
                           background:
                             theme.palette.mode === "dark"
@@ -786,7 +754,7 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
                 sx={{
                   p: 4,
                   textAlign: "center",
-                  borderRadius: 3,
+                  borderRadius: 2,
                   background:
                     theme.palette.mode === "dark"
                       ? "linear-gradient(to right, rgba(30, 30, 30, 0.5), rgba(30, 30, 30, 0.3))"
@@ -865,53 +833,45 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
               What's Included
             </Typography>
             <Stack spacing={2} sx={{ mt: 2 }}>
-              {[
-                "Full source code",
-                "Documentation",
-                "6 months support",
-              ].map((item, index) => (
-                <Fade
-                  in
-                  key={index}
-                  timeout={500}
-                  style={{ transitionDelay: `${index * 100}ms` }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      p: 2,
-                      borderRadius: 2,
-                      background:
-                        theme.palette.mode === "dark"
-                          ? "rgba(255, 255, 255, 0.03)"
-                          : "rgba(0, 0, 0, 0.02)",
-                      transition: "all 0.2s ease",
-                      "&:hover": {
+              {["Full source code", "Documentation", "6 months support"].map(
+                (item, index) => (
+                  <Fade
+                    in
+                    key={index}
+                    timeout={500}
+                    style={{ transitionDelay: `${index * 100}ms` }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        p: 2,
+                        borderRadius: 2,
                         background:
                           theme.palette.mode === "dark"
-                            ? "rgba(255, 255, 255, 0.05)"
-                            : "rgba(0, 0, 0, 0.04)",
-                      },
-                    }}
-                  >
-                    <ThumbUp color="primary" sx={{ fontSize: 24, mr: 2 }} />
-                    <Typography variant="body1" color="text.secondary">
-                      {item}
-                    </Typography>
-                  </Box>
-                </Fade>
-              ))}
+                            ? "rgba(255, 255, 255, 0.03)"
+                            : "rgba(0, 0, 0, 0.02)",
+                        transition: "all 0.2s ease",
+                        "&:hover": {
+                          background:
+                            theme.palette.mode === "dark"
+                              ? "rgba(255, 255, 255, 0.05)"
+                              : "rgba(0, 0, 0, 0.04)",
+                        },
+                      }}
+                    >
+                      <ThumbUp color="primary" sx={{ fontSize: 24, mr: 2 }} />
+                      <Typography variant="body1" color="text.secondary">
+                        {item}
+                      </Typography>
+                    </Box>
+                  </Fade>
+                )
+              )}
             </Stack>
           </TabPanel>
         </Box>
       </DialogContent>
-
-      <ScrollTop>
-        <Fab color="primary" size="medium" aria-label="scroll back to top">
-          <ArrowBack sx={{ transform: "rotate(90deg)" }} />
-        </Fab>
-      </ScrollTop>
     </Dialog>
   );
 }

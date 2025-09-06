@@ -172,7 +172,7 @@ export default function CustomProjectToggleForm({ user }) {
             elevation={0}
             sx={{
               p: { xs: 2, md: 4 },
-              borderRadius: 4,
+              borderRadius: 2,
               position: "relative",
               maxWidth: 900,
               mx: "auto",
