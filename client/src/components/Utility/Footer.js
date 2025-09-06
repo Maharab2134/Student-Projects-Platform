@@ -33,12 +33,6 @@ const social = [
     name: "Facebook",
   },
   {
-    icon: <GitHub />,
-    href: "https://github.com/Maharab2134",
-    color: "#333333",
-    name: "GitHub",
-  },
-  {
     icon: <LinkedIn />,
     href: "https://linkedin.com/",
     color: "#0a66c2",
