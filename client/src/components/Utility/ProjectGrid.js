@@ -17,8 +17,7 @@ import {
 } from "@mui/material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Rating from "@mui/material/Rating";
 import ReactMarkdown from "react-markdown";
 
@@ -123,9 +122,10 @@ export default function ProjectGrid({
         </Box>
       ) : (
         filtered.map((project, i) => {
-          const ratingData = projectRatings.find(
-            (r) => r.projectId === project._id
-          );
+          // Safe handling of potentially undefined projectRatings
+          const ratingData = projectRatings
+            ? projectRatings.find((r) => r.projectId === project._id)
+            : null;
           const averageRating = ratingData?.averageRating || 0;
           const ratingCount = ratingData?.ratingCount || 0;
 
@@ -301,22 +301,15 @@ export default function ProjectGrid({
                     >
                       {projectRatings && (
                         <Tooltip
-                          title={(() => {
-                            const r = projectRatings.find(
-                              (r) => r.projectId === project._id
-                            );
-                            return r && r.ratingCount > 0
+                          title={
+                            ratingData && ratingCount > 0
                               ? `Average rating from order(s)`
-                              : "No ratings yet";
-                          })()}
+                              : "No ratings yet"
+                          }
                         >
                           <span>
                             <Rating
-                              value={
-                                projectRatings.find(
-                                  (r) => r.projectId === project._id
-                                )?.averageRating * 1 || 0
-                              }
+                              value={averageRating}
                               precision={0.1}
                               readOnly
                               size="small"

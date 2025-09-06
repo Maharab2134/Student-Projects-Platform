@@ -588,7 +588,7 @@ function App() {
               >
                 {user && !user.isAdmin && <CustomProjectModal user={user} />}
               </section>
-
+              {/* Add more sections as needed */}
               <section
                 style={{
                   padding: "18px 0",
@@ -599,7 +599,6 @@ function App() {
               >
                 {(!user || !user.isAdmin) && <SuccessStories />}
               </section>
-              {/* Add more sections as needed */}
             </>
           )}
 

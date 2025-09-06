@@ -225,7 +225,7 @@ export default function SuccessStories() {
           zIndex: 1,
         }}
       >
-        Success Stories
+        Client Reviews
       </Typography>
 
       <Typography
