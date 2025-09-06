@@ -209,7 +209,7 @@ export default function Footer({ setPage }) {
                     underline="hover"
                     sx={{ color: "#fff", fontWeight: 500 }}
                   >
-                    studentcrafted@gmail.com
+                    projectshopstudent@gmail.com
                   </Link>
                 </Box>
 
