@@ -589,6 +589,7 @@ function App() {
                 {user && !user.isAdmin && <CustomProjectModal user={user} />}
               </section>
               {/* Add more sections as needed */}
+
               <section
                 style={{
                   padding: "18px 0",
@@ -598,6 +599,61 @@ function App() {
                 }}
               >
                 {(!user || !user.isAdmin) && <SuccessStories />}
+              </section>
+              <section
+                style={{
+                  padding: "40px 0",
+                  margin: "32px 0",
+                  textAlign: "center",
+                }}
+              >
+                <Typography variant="h3" sx={{ mb: 3, color: "primary.main" }}>
+                  Why Choose Us?
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    justifyContent: "center",
+                    gap: 4,
+                  }}
+                >
+                  {[
+                    {
+                      icon: "🚀",
+                      title: "Fast Delivery",
+                      desc: "24/7 support and quick project delivery",
+                    },
+                    {
+                      icon: "💯",
+                      title: "Quality Assurance",
+                      desc: "High quality code and documentation",
+                    },
+                    {
+                      icon: "🛡️",
+                      title: "Secure Payment",
+                      desc: "Multiple secure payment options",
+                    },
+                    {
+                      icon: "📞",
+                      title: "24/7 Support",
+                      desc: "Round the clock customer support",
+                    },
+                  ].map((item, index) => (
+                    <Box
+                      key={index}
+                      sx={{ maxWidth: 250, textAlign: "center", p: 2 }}
+                    >
+                      <Typography variant="h2">{item.icon}</Typography>
+                      <Typography variant="h6" sx={{ mt: 1, mb: 1 }}>
+                        {item.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.desc}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
               </section>
             </>
           )}

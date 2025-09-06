@@ -206,14 +206,14 @@ export default function ProjectGrid({
                       display: "-webkit-box",
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: "vertical",
-                      minHeight: "3.2rem",
+                      minHeight: "2rem",
                     }}
                   >
                     {project.title}
                   </Typography>
 
                   {/* Description with expand functionality */}
-                  <Box sx={{ mb: 1 }}>
+                  <Box sx={{ mb: 0.2 }}>
                     <Typography
                       variant="body2"
                       sx={{
