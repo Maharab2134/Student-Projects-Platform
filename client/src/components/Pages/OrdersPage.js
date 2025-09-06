@@ -223,7 +223,7 @@ export default function OrdersPage({ myOrders, setMyOrders, user }) {
               fontWeight={700}
               sx={{
                 textAlign: "center",
-                background: "linear-gradient(90deg, #0f2027 0%, #2c5364 100%)",
+                background: "linear-gradient(90deg, #bcc4c7ff 0%, #2c5364 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 fontWeight: 700,
