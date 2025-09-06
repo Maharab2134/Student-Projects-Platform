@@ -121,7 +121,7 @@ export default function RefundPolicyPage() {
               href="mailto:studentcrafted@gmail.com"
               style={{ color: "#1976d2", textDecoration: "none" }}
             >
-              studentcrafted@gmail.com{" "}
+              projectshopstudent@gmail.com{" "}
             </a>
             .
           </Typography>
