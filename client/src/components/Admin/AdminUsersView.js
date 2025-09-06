@@ -82,7 +82,7 @@ export default function AdminUsersView({
     if (!deliveredOrder) {
       setSnackbar({
         open: true,
-        msg: "No Delivery/Completed order found for this user!",
+        msg: "No Delivery order found for this user!",
         success: false,
       });
       setSending(false);

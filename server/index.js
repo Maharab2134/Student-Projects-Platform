@@ -636,7 +636,7 @@ We appreciate your trust in our service and look forward to working with you aga
 
 Best regards,
 🚀 Student Project Shop Team
-studentcrafted@gmail.com
+projectshopstudent@gmail.com
 `;
 
     // Optional: HTML version for email clients that support rich formatting
@@ -677,7 +677,7 @@ studentcrafted@gmail.com
   <p>
     Best regards,<br>
     🚀 <b>Student Project Shop Team</b><br>
-    studentcrafted@gmail.com
+    projectshopstudent@gmail.com
   </p>
   <hr style="margin-top:30px; border:none; border-top:1px solid #ddd;">
   <p style="font-size:13px; color:#888;">&copy; ${new Date().getFullYear()} Student Project Shop. All rights reserved.</p>
@@ -689,14 +689,14 @@ studentcrafted@gmail.com
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "studentcrafted@gmail.com",
+        user: "projectshopstudent@gmail.com",
         pass: process.env.GMAIL_APP_PASSWORD,
       },
     });
 
     // Send mail
     await transporter.sendMail({
-      from: "studentcrafted@gmail.com",
+      from: "projectshopstudent@gmail.com",
       to,
       subject,
       text: body,
