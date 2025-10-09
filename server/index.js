@@ -15,7 +15,7 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error(err));
 
-// User schema with unique constraints
+// User schema with unique constraints, institute and idNumber optional
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: {
@@ -26,12 +26,22 @@ const userSchema = new mongoose.Schema({
     trim: true,
   },
   phone: { type: String, required: true },
-  institute: { type: String, required: true },
+  institute: { type: String },
   address: { type: String, required: true },
-  idNumber: { type: String, unique: true, required: true, trim: true },
+  idNumber: { type: String, trim: true }, // optional, no unique here
   password: { type: String, required: true },
   isAdmin: { type: Boolean, default: false },
 });
+
+// 👇 Add this after schema definition
+userSchema.index(
+  { idNumber: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { idNumber: { $exists: true, $ne: "" } },
+  }
+);
+
 const User = mongoose.model("User", userSchema);
 
 const reviewSchema = new mongoose.Schema({
@@ -66,7 +76,7 @@ const Order = mongoose.model(
     paymentMethod: String,
     transactionId: String,
     rating: { type: Number, default: 0 },
-    review: { type: String, default: "" }, // <-- review field
+    review: { type: String, default: "" },
     status: { type: String, default: "Pending" },
     createdAt: { type: Date, default: Date.now },
   })
@@ -96,7 +106,7 @@ const TeamMember = mongoose.model(
     name: { type: String, required: true },
     role: { type: String, required: true },
     img: { type: String, required: true },
-    order: { type: Number, default: 0 }, // <-- for ordering
+    order: { type: Number, default: 0 },
   })
 );
 
@@ -160,9 +170,9 @@ app.post("/api/login", async (req, res) => {
       name: user.name,
       email: user.email,
       phone: user.phone,
-      institute: user.institute,
+      institute: user.institute || "",
       address: user.address,
-      idNumber: user.idNumber,
+      idNumber: user.idNumber || "",
     },
     process.env.JWT_SECRET,
     { expiresIn: "1d" }
@@ -170,28 +180,21 @@ app.post("/api/login", async (req, res) => {
   res.json({ token, isAdmin: user.isAdmin, name: user.name });
 });
 
-// Student registration
+// Student registration (institute and idNumber optional)
 app.post("/api/register", async (req, res) => {
   const { name, email, phone, institute, address, idNumber, password } =
     req.body;
 
-  if (
-    !name ||
-    !email ||
-    !phone ||
-    !institute ||
-    !address ||
-    !idNumber ||
-    !password
-  ) {
+  // Only require name, email, phone, address, password
+  if (!name || !email || !phone || !address || !password) {
     return res.status(400).send("Missing fields");
   }
 
   try {
-    // Check for existing user with same email or idNumber
-    const existingUser = await User.findOne({
-      $or: [{ email: email.toLowerCase() }, { idNumber: idNumber }],
-    });
+    // Check for existing user with same email or idNumber (if provided)
+    let query = [{ email: email.toLowerCase() }];
+    if (idNumber) query.push({ idNumber: idNumber });
+    const existingUser = await User.findOne({ $or: query });
 
     if (existingUser) {
       return res.status(400).send("Email or ID Number already registered");
@@ -203,9 +206,9 @@ app.post("/api/register", async (req, res) => {
       name,
       email: email.toLowerCase(),
       phone,
-      institute,
+      institute, // will be undefined if not provided
       address,
-      idNumber,
+      idNumber, // will be undefined if not provided
       password: hashed,
     });
 
